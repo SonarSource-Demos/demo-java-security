@@ -8,7 +8,7 @@ echo "Deleting project from $SONAR_HOST_URL"
 curl -X POST -u $SONAR_TOKEN: $SONAR_HOST_URL/api/projects/delete?project=$PK
 
 # Checkout commit for new code period
-git checkout tags/$NEWCODE_TAG -b $MAIN_BRANCH
+git checkout tags/$NEWCODE_TAG
 NEWCODE_DATE=`git show -s --format=%cd --date=format:'%Y-%m-%d'`
 
 # Run baseline analysis - wait for quality gate to ensure analysis ID is available
