@@ -36,7 +36,6 @@ public class Insecure {
     String query = "SELECT userid FROM users WHERE username = '" + user  + "'";
     Statement statement = connection.createStatement();
     ResultSet resultSet = statement.executeQuery(query);
-    //TODO
     return resultSet.getString(0);
   }
   
@@ -46,12 +45,6 @@ public class Insecure {
 	  ResultSet rs = statement.executeQuery("select userid from users WHERE username=" + user);
 	  return rs.getString(0);
 	}
-
-
-  public void modResponse(HttpServletResponse response) {
-    Cookie c = new Cookie("SECRET", "SECRET");
-    response.addCookie(c);
-  }
 
   // --------------------------------------------------------------------------
   // Custom sources, sanitizer and sinks example
