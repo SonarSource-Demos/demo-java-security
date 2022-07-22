@@ -35,6 +35,6 @@ public class Utils {
     public static void executeJs(String input) throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("JavaScript");
-        engine.eval(input); // Noncompliant
+        engine.eval(input);
     }
 }

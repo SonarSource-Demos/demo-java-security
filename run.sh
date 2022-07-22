@@ -31,4 +31,4 @@ curl -X POST -u $SONAR_TOKEN: \
 git checkout $MAIN_BRANCH
 
 #Run New code analysis
-mvn clean verify sonar:sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$PK
+mvn clean verify jacoco:report sonar:sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=$PK
