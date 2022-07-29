@@ -28,7 +28,7 @@ public class WebUtils {
                 try {
                     socket.close();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    // TODO - Handle this
                 }
             }
         }
