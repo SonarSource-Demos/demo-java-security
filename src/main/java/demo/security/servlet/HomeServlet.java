@@ -22,6 +22,10 @@ public class HomeServlet extends HttpServlet {
                          HttpServletResponse response) throws ServletException, IOException {
         String name = request.getParameter("name").trim();
         response.setContentType("text/html");
+        writeResponse(name);
+    }
+    
+    protected void writeResponse(String name) throws IOException {
         PrintWriter out = response.getWriter();
         out.print("<h2>Hello "+name+ "</h2>");
         out.close();
@@ -29,7 +33,6 @@ public class HomeServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
         doGet(request, response);
     }
 
