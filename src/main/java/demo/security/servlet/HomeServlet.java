@@ -22,10 +22,10 @@ public class HomeServlet extends HttpServlet {
                          HttpServletResponse response) throws ServletException, IOException {
         String name = request.getParameter("name").trim();
         response.setContentType("text/html");
-        writeResponse(name);
+        writeResponse(response, name);
     }
     
-    protected void writeResponse(String name) throws IOException {
+    protected void writeResponse(HttpServletResponse response, String name) throws IOException {
         PrintWriter out = response.getWriter();
         out.print("<h2>Hello "+name+ "</h2>");
         out.close();
