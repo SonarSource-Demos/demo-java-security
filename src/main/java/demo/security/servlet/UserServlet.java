@@ -17,7 +17,9 @@ import java.util.List;
 public class UserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String user = request.getParameter("username");
+        SessionHeader sessionHeader = getSessionHeader(request);
+        if (sessionHeader == null) return;
+        String user = sessionHeader.getUsername();
         String query = "SELECT userid FROM users WHERE username = '" + user  + "'";
         try {
             DBUtils db = new DBUtils();
