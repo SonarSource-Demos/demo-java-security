@@ -53,13 +53,7 @@
       <artifactId>junit</artifactId>
       <version>4.13.2</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-war-plugin</artifactId>
-      <version>3.4.1-SNAPSHOT</version> 
-      <type>maven-plugin</type>
-    </dependency>    
+    </dependency> 
   </dependencies>
   <build>
     <plugins>
@@ -95,6 +89,11 @@
           <artifactId>sonar-maven-plugin</artifactId>
           <version>3.9.1.2184</version>
         </plugin>
+              <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-war-plugin</artifactId>
+    <version>3.4.1-SNAPSHOT</version>
+</plugin>
       </plugins>
     </pluginManagement>
   </build>
