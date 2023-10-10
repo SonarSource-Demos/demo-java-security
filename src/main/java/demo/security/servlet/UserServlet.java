@@ -17,10 +17,7 @@ import java.util.List;
 public class UserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        SessionHeader sessionHeader = getSessionHeader(request);
-        if (sessionHeader == null) return;
-        String user = sessionHeader.getUsername();
-        String query = "SELECT userid FROM users WHERE username = '" + user  + "'";
+        String user = request.getParameter("username");
         try {
             DBUtils db = new DBUtils();
             List<String> users = db.findUsers(user);
@@ -52,6 +49,20 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        SessionHeader sessionHeader = getSessionHeader(request);
+        if (sessionHeader == null) return;
+        String user = sessionHeader.getUsername();
+        try {
+            DBUtils db = new DBUtils();
+            List<String> users = db.findUsers(user);
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            users.forEach((result) -> {
+                out.print("<h2>User "+result+ "</h2>");
+            });
+            out.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
