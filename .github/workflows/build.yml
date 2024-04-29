@@ -1,6 +1,6 @@
 name: SonarCloud
-on:
-  workflow_run:
+on: 
+  workflow_dispatch:
   push:
     branches:
       - main
