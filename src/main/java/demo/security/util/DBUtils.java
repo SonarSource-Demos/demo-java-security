@@ -15,8 +15,10 @@ public class DBUtils {
 
     public List<String> findUsers(String user) throws Exception {
         String query = "SELECT userid FROM users WHERE username = '" + user  + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
+        ResultSet resultSet;
+        try (Statement statement = connection.createStatement()) {
+            resultSet = statement.executeQuery(query);
+        }
         List<String> users = new ArrayList<String>();
         while (resultSet.next()){
             users.add(resultSet.getString(0));
