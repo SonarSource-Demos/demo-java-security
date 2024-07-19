@@ -21,6 +21,7 @@ public class Utils {
     public static KeyPair generateKey() {
         KeyPairGenerator keyPairGen;
         try {
+            String instanceName = "RSA";
             keyPairGen = KeyPairGenerator.getInstance("RSA");
             keyPairGen.initialize(512);
             return keyPairGen.genKeyPair();
