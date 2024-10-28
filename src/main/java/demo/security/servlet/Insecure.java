@@ -23,7 +23,7 @@ public class Insecure {
     String obj = request.getParameter("data");
     ObjectMapper mapper = new ObjectMapper();
     mapper.enableDefaultTyping();
-    String val = mapper.readValue(obj, String.class);
+    //String val = mapper.readValue(obj, String.class);
     File tempDir;
     tempDir = File.createTempFile("", ".");
     tempDir.delete();
