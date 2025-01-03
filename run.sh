@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PK="demo:java-security"
+PK="SonarCloud-Demos_demo-java-security"
 MAIN_BRANCH="main"
 NEWCODE_TAG="newcode-start"
 
