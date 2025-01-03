@@ -16,7 +16,7 @@ public class WebUtils {
 
     public static void getSessionId(HttpServletRequest request){
         String sessionId = request.getRequestedSessionId();
-        if (sessionId == null || sessionId != null){
+        if (sessionId != null){
             String ip = "10.40.1.1";
             Socket socket = null;
             try {
