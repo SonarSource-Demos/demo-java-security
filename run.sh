@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 PK="SonarCloud-Demos_demo-java-security"
 MAIN_BRANCH="main"
