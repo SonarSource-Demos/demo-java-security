@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash  
 
 PK="demo:java-security"
 MAIN_BRANCH="main"
