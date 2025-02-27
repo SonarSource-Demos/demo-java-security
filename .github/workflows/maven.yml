@@ -47,8 +47,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=demo:java-security
-      #run: mvn -B package --file pom.xml
+      run: |
+        mvn -B test -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+        -Dmaven.test.skip=true \
+        -Dsonar.projectKey="demo:java-security" \
+        -Dsonar.projectName="Java Web App" \
+        -Dsonar.branch.name="main" \
+        -Dsonar.javaOpts="-Xmx8192m " \
+        -Dsonar.scanner.debug="true" \
+        -Dsonar.sources="." \
+        -Dsonar.exclusions="src/test/java/**/*" \
+        -Dsonar.tests="src/test/java" \
+        -X
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     #- name: Update dependency graph
