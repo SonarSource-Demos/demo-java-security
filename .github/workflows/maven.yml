@@ -52,7 +52,7 @@ jobs:
         -Dmaven.test.skip=true \
         -Dsonar.projectKey="demo:java-security" \
         -Dsonar.projectName="Java Web App" \
-        -Dsonar.branch.name="main" \
+        -Dsonar.branch.name="${{ github.head_ref || github.ref_name }}" \
         -Dsonar.javaOpts="-Xmx8192m " \
         -Dsonar.scanner.debug="true" \
         -Dsonar.sources="." \
