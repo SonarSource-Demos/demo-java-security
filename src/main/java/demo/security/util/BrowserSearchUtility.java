@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class BrowserSearchUtility {
+public class BrowserSearchUtility {  
 
     public static void main(String[] args) {
         String query = "sonarsource";
