@@ -10,7 +10,8 @@ name: SonarQube Analyze
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - '**'  # This will trigger the workflow on pushes to any branch
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
