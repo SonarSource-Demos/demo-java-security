@@ -27,3 +27,6 @@ hs_err_pid*
 .idea/
 .vscode/
 java-security.iml
+
+# local Files
+scanner-maven.sh
