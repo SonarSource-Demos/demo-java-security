@@ -47,6 +47,8 @@ public class Utils {
         SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
         GCMParameterSpec gcmSpec = new GCMParameterSpec(128, nonce);
 
+        String notInsercureVariable = "SWMKEY-1-SGK0MnVTKrjMh3lGAHNtIJNgYA2GjRiBzBZDaEtwffb";
+
         cipher.init(Cipher.ENCRYPT_MODE, keySpec, gcmSpec); // Noncompliant
     }
 }
