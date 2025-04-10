@@ -50,8 +50,8 @@ jobs:
           SONAR_HOST_URL: ${{ vars.NAUTILUS2_HOST_URL }}
       run: |
         mvn -B test -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-        -Dsonar.projectKey="demo:java-security" \
-        -Dsonar.projectName="Java Web App" \
+        -Dsonar.projectKey="halfdayinc-team_demo-java-security_e471ce20-3fa0-47fa-9198-5edf0954a612" \
+        -Dsonar.projectName="demo-java-security" \
         -Dsonar.branch.name="${{ github.head_ref || github.ref_name }}" \
         -Dsonar.javaOpts="-Xmx8192m " \
         -Dsonar.scanner.debug="true" \
@@ -68,8 +68,8 @@ jobs:
           SONAR_HOST_URL: ${{ vars.NAUTILUS2_HOST_URL }}
       run: |
         mvn -B test -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-        -Dsonar.projectKey="demo:java-security" \
-        -Dsonar.projectName="Java Web App" \
+        -Dsonar.projectKey="halfdayinc-team_demo-java-security_e471ce20-3fa0-47fa-9198-5edf0954a612" \
+        -Dsonar.projectName="demo-java-security" \
         -Dsonar.pullrequest.key="${{ github.event.pull_request.number }}" \
         -Dsonar.pullrequest.base="${{ github.event.pull_request.base.ref }}" \
         -Dsonar.pullrequest.branch="${{ github.head_ref }}" \
