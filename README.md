@@ -8,9 +8,30 @@ This example demonstrates:
 It also demonstrates the possibility to define your own custom sources, sanitizers and sinks to detect more injection cases
 (or avoid false positives)
 
+## :boom: Warning
+Please do not point this project at the live SonarQube project on https://nautilus.sonarqube.org. It requires two environment variables to run:
+
+`SONAR_HOST_URL`
+`SONAR_TOKEN`
+
+If you want to run the bash script to initialize this in your own SonaqQube instance, set the above variables for your individual SonarQube instance, not for `nautilus`. The bash script below deletes and re-initializes the project, and we do *not* want the project on `nautilus` to be deleted.
+
 ## Usage
 
-Run `./run.sh`
+You first must make sure maven is installed on your machine. For MacOS:
+
+`brew install maven`
+
+Next, set your environment variables:
+
+`export SONAR_HOST_URL=https://myngrok-url.ngrok.io`
+`export SONAR_TOKEN=<INSERT USER TOKEN HERE>`
+
+You can generate a Sonar token by following the document below:
+
+https://docs.sonarsource.com/sonarqube-server/latest/user-guide/managing-tokens/#generating-a-token
+
+Once you set these variables, run `./run.sh`
 
 This will:
 - Delete the project key **training:java-security** if it exists in SonarQube (to start from a scratch)
