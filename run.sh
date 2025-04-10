@@ -1,6 +1,6 @@
 #!/bin/bash  
 
-PK_DEFAULT="demo:java-securityrtrtrt5t"
+PK_DEFAULT="demo:java-security"
 MAIN_BRANCH="main"
 NEWCODE_TAG="newcode-start"
 
