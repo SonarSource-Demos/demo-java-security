@@ -46,8 +46,8 @@ jobs:
     - name: Build with Maven and analyze with SonarQube
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.NAUTILUS2_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.NAUTILUS2_HOST_URL }}
       run: |
         mvn -B test -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
         -Dsonar.projectKey="demo:java-security" \
@@ -64,8 +64,8 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.NAUTILUS2_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.NAUTILUS2_HOST_URL }}
       run: |
         mvn -B test -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
         -Dsonar.projectKey="demo:java-security" \
