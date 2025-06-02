@@ -75,6 +75,11 @@
       <version>1.10.19</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>1.10.0</version> <!-- Use the latest stable version -->
+    </dependency>
   </dependencies>
   <build>
     <plugins>
