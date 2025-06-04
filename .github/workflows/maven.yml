@@ -50,9 +50,6 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       run: |
         mvn -B test -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-        -Dsonar.projectKey="demo:java-security" \
-        -Dsonar.projectName="Java Web App" \
-        -Dsonar.branch.name="${{ github.head_ref || github.ref_name }}" \
         -Dsonar.javaOpts="-Xmx8192m " \
         -Dsonar.scanner.debug="true" \
         -Dsonar.sources="." \
@@ -68,8 +65,6 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       run: |
         mvn -B test -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-        -Dsonar.projectKey="demo:java-security" \
-        -Dsonar.projectName="Java Web App" \
         -Dsonar.pullrequest.key="${{ github.event.pull_request.number }}" \
         -Dsonar.pullrequest.base="${{ github.event.pull_request.base.ref }}" \
         -Dsonar.pullrequest.branch="${{ github.head_ref }}" \
