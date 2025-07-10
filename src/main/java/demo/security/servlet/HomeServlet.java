@@ -23,7 +23,7 @@ public class HomeServlet extends HttpServlet {
         String name = request.getParameter("name").trim();
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        //out.print("<h2>Hello "+name+ "</h2>");
+        out.print("<h2>Hello "+name+ "</h2>");
         out.close();
     }
 
