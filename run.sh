@@ -1,1 +1,1 @@
-this script was a bad idea. Removing its entire content
+this script was a bad idea. Removing its entire content 
