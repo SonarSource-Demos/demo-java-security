@@ -14,23 +14,47 @@ public class HomeServlet2 extends HttpServlet {
 
     public HomeServlet2() {
         super();
-        // TODO Auto-generated constructor stub
+        // Constructor logic can be added here if needed
     }
 
 
+    @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        String name = request.getParameter("name").trim();
+        String name = request.getParameter("name");
+        if (name != null) {
+            name = name.trim();
+        } else {
+            name = "Guest";
+        }
+        // Sanitize user input to prevent XSS
+        name = name.replaceAll("[<>]", "");
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-        out.print("<h2>Hello "+name+ "</h2>");
-        out.close();
+        try (PrintWriter out = response.getWriter()) {
+            out.print("<h2>Hello " + name + "</h2>");
+        } catch (IOException e) {
+            // Handle IOException from getWriter
+            try {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error writing response");
+            } catch (IOException ex) {
+                // Log error or take further action if needed
+            }
+        }
     }
 
+    @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        doGet(request, response);
+        // POST-specific logic can be added here if needed
+        try {
+            doGet(request, response);
+        } catch (ServletException | IOException e) {
+            try {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error in doPost");
+            } catch (IOException ex) {
+                // Log error or take further action if needed
+            }
+        }
     }
 
 }
