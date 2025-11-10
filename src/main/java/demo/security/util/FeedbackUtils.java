@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -51,16 +52,17 @@ public class FeedbackUtils {
         }
     }
 
-    // LDAP Injection vulnerability
-    @SuppressWarnings("java:S1149") // Hashtable required by InitialDirContext API
+    // LDAP Injection vulnerability  
     public List<String> findUserByEmail(String email) throws NamingException {
-        Hashtable<String, String> env = new Hashtable<>();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, "ldap://localhost:389");
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=example,dc=com");
-        env.put(Context.SECURITY_CREDENTIALS, "admin123"); // Hard-coded credentials
+        HashMap<String, String> envMap = new HashMap<>();
+        envMap.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        envMap.put(Context.PROVIDER_URL, "ldap://localhost:389");
+        envMap.put(Context.SECURITY_AUTHENTICATION, "simple");
+        envMap.put(Context.SECURITY_PRINCIPAL, "cn=admin,dc=example,dc=com");
+        envMap.put(Context.SECURITY_CREDENTIALS, "admin123"); // Hard-coded credentials
 
+        // InitialDirContext requires Hashtable per JNDI spec, convert from HashMap
+        Hashtable<String, String> env = new Hashtable<>(envMap);
         DirContext ctx = new InitialDirContext(env);
         
         // LDAP Injection vulnerability
