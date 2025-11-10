@@ -52,6 +52,7 @@ public class FeedbackUtils {
     }
 
     // LDAP Injection vulnerability
+    @SuppressWarnings("java:S1149") // Hashtable required by InitialDirContext API
     public List<String> findUserByEmail(String email) throws NamingException {
         Hashtable<String, String> env = new Hashtable<>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
