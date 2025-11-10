@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Date;
 import java.util.Properties;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Email utility class for sending feedback notifications
@@ -11,6 +13,7 @@ import java.util.Properties;
  */
 public class EmailUtil {
     
+    private static final Logger logger = Logger.getLogger(EmailUtil.class.getName());
     private static final String SMTP_HOST = "localhost";
     private static final int SMTP_PORT = 25;
     private static final String FROM_EMAIL = "noreply@security-demo.com";
@@ -51,7 +54,7 @@ public class EmailUtil {
             return sendViaSmtp(emailContent.toString());
             
         } catch (Exception e) {
-            System.err.println("Failed to send email notification: " + e.getMessage());
+            logger.log(Level.SEVERE, "Failed to send email notification: " + e.getMessage(), e);
             return false;
         }
     }
@@ -63,9 +66,9 @@ public class EmailUtil {
     private boolean sendViaSmtp(String emailContent) {
         try {
             // Log the email content (in real app, this would send to SMTP server)
-            System.out.println("=== EMAIL NOTIFICATION (would be sent via SMTP) ===");
-            System.out.println(emailContent);
-            System.out.println("=== END EMAIL ===");
+            logger.info("=== EMAIL NOTIFICATION (would be sent via SMTP) ===");
+            logger.info(emailContent);
+            logger.info("=== END EMAIL ===");
             
             // Simulate network delay
             Thread.sleep(100);
@@ -75,7 +78,7 @@ public class EmailUtil {
             return true;
             
         } catch (Exception e) {
-            System.err.println("SMTP simulation failed: " + e.getMessage());
+            logger.log(Level.WARNING, "SMTP simulation failed: " + e.getMessage(), e);
             return false;
         }
     }

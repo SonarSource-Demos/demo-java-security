@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -131,7 +132,7 @@ public class AdminFeedbackServlet extends HttpServlet {
         }
     }
     
-    private void displaySingleFeedback(PrintWriter out, FeedbackDAO dao, String feedbackId) throws Exception {
+    private void displaySingleFeedback(PrintWriter out, FeedbackDAO dao, String feedbackId) throws SQLException {
         FeedbackRecord feedback = dao.getFeedbackById(feedbackId);
         
         if (feedback != null) {
@@ -158,7 +159,7 @@ public class AdminFeedbackServlet extends HttpServlet {
         }
     }
     
-    private void displaySearchResults(PrintWriter out, FeedbackDAO dao, String searchTerm, String orderBy) throws Exception {
+    private void displaySearchResults(PrintWriter out, FeedbackDAO dao, String searchTerm, String orderBy) throws SQLException {
         List<FeedbackRecord> results = dao.searchFeedback(searchTerm, orderBy);
         
         out.println("<h2>Search Results for: \"" + searchTerm + "\"</h2>");
