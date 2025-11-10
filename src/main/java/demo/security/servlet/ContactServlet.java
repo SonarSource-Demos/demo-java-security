@@ -22,16 +22,16 @@ public class ContactServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String feedbackId = request.getParameter("id");
         response.setContentType("text/html");
-        try (PrintWriter out = response.getWriter()) {
-            if (feedbackId != null && !feedbackId.isEmpty()) {
-                displayFeedback(feedbackId, out);
-            } else {
-                displayForm(out);
-            }
+        
+        if (feedbackId != null && !feedbackId.isEmpty()) {
+            displayFeedback(feedbackId, response);
+        } else {
+            displayForm(response);
         }
     }
 
-    private void displayFeedback(String feedbackId, PrintWriter out) throws ServletException {
+    private void displayFeedback(String feedbackId, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
         try {
             DBUtils db = new DBUtils();
             List<String> feedback = db.findContactFeedback(feedbackId);
@@ -43,19 +43,26 @@ public class ContactServlet extends HttpServlet {
             throw new ServletException("Database connection error", e);
         } catch (DatabaseException e) {
             throw new ServletException("Error retrieving feedback", e);
+        } finally {
+            out.close();
         }
     }
 
-    private void displayForm(PrintWriter out) {
-        out.println(HTML_HEADER);
-        out.println("<h1>Contact Form</h1>");
-        out.println("<form method='post'>");
-        out.println("Name: <input type='text' name='name'/><br/>");
-        out.println("Email: <input type='text' name='email'/><br/>");
-        out.println("Message: <textarea name='message'></textarea><br/>");
-        out.println("<input type='submit' value='Submit'/>");
-        out.println("</form>");
-        out.println(HTML_FOOTER);
+    private void displayForm(HttpServletResponse response) throws IOException {
+        PrintWriter out = response.getWriter();
+        try {
+            out.println(HTML_HEADER);
+            out.println("<h1>Contact Form</h1>");
+            out.println("<form method='post'>");
+            out.println("Name: <input type='text' name='name'/><br/>");
+            out.println("Email: <input type='text' name='email'/><br/>");
+            out.println("Message: <textarea name='message'></textarea><br/>");
+            out.println("<input type='submit' value='Submit'/>");
+            out.println("</form>");
+            out.println(HTML_FOOTER);
+        } finally {
+            out.close();
+        }
     }
 
     @Override
@@ -65,12 +72,11 @@ public class ContactServlet extends HttpServlet {
         String message = request.getParameter("message");
 
         response.setContentType("text/html");
-        try (PrintWriter out = response.getWriter()) {
-            saveFeedbackAndDisplayConfirmation(name, email, message, out);
-        }
+        saveFeedbackAndDisplayConfirmation(name, email, message, response);
     }
 
-    private void saveFeedbackAndDisplayConfirmation(String name, String email, String message, PrintWriter out) throws ServletException {
+    private void saveFeedbackAndDisplayConfirmation(String name, String email, String message, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
         try {
             DBUtils db = new DBUtils();
             db.saveContactFeedback(name, email, message);
@@ -86,6 +92,8 @@ public class ContactServlet extends HttpServlet {
             throw new ServletException("Database connection error", e);
         } catch (DatabaseException e) {
             throw new ServletException("Error saving feedback", e);
+        } finally {
+            out.close();
         }
     }
 }
