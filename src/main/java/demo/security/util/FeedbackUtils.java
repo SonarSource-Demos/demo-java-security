@@ -2,6 +2,7 @@ package demo.security.util;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
@@ -12,7 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 public class FeedbackUtils {
@@ -32,28 +33,27 @@ public class FeedbackUtils {
             throws SQLException {
         String query = "INSERT INTO feedback (name, email, subject, message) VALUES ('" 
                 + name + "', '" + email + "', '" + subject + "', '" + message + "')";
-        Statement statement = connection.createStatement();
-        statement.executeUpdate(query);
-        statement.close();
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(query);
+        }
     }
 
     // SQL Injection vulnerability in search
     public List<String> searchFeedback(String keyword) throws SQLException {
         String query = "SELECT * FROM feedback WHERE message LIKE '%" + keyword + "%'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        List<String> results = new ArrayList<>();
-        while (resultSet.next()) {
-            results.add(resultSet.getString("message"));
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            List<String> results = new ArrayList<>();
+            while (resultSet.next()) {
+                results.add(resultSet.getString("message"));
+            }
+            return results;
         }
-        resultSet.close();
-        statement.close();
-        return results;
     }
 
     // LDAP Injection vulnerability
-    public List<String> findUserByEmail(String email) throws Exception {
-        Hashtable<String, String> env = new Hashtable<>();
+    public List<String> findUserByEmail(String email) throws NamingException {
+        HashMap<String, String> env = new HashMap<>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, "ldap://localhost:389");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
@@ -82,15 +82,14 @@ public class FeedbackUtils {
     // SQL Injection vulnerability for retrieving feedback
     public String getFeedbackById(String feedbackId) throws SQLException {
         String query = "SELECT message FROM feedback WHERE id = " + feedbackId;
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        String message = null;
-        if (resultSet.next()) {
-            message = resultSet.getString("message");
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            String message = null;
+            if (resultSet.next()) {
+                message = resultSet.getString("message");
+            }
+            return message;
         }
-        resultSet.close();
-        statement.close();
-        return message;
     }
 
     public void close() throws SQLException {
