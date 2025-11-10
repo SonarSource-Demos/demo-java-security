@@ -13,25 +13,39 @@ public class DBUtils {
                 "mYJDBCUrl", "myJDBCUser", "myJDBCPass");
     }
 
-    public List<String> findUsers(String user) throws Exception {
+    public List<String> findUsers(String user) throws SQLException {
         String query = "SELECT userid FROM users WHERE username = '" + user  + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        List<String> users = new ArrayList<String>();
-        while (resultSet.next()){
-            users.add(resultSet.getString(0));
+        List<String> users = new ArrayList<>();
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()){
+                users.add(resultSet.getString(1));
+            }
         }
         return users;
     }
 
-    public List<String> findItem(String itemId) throws Exception {
+    public List<String> findItem(String itemId) throws SQLException {
         String query = "SELECT item_id FROM items WHERE item_id = '" + itemId  + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        List<String> items = new ArrayList<String>();
-        while (resultSet.next()){
-            items.add(resultSet.getString(0));
+        List<String> items = new ArrayList<>();
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()){
+                items.add(resultSet.getString(1));
+            }
         }
         return items;
+    }
+
+    public List<String> findFeedback(String feedbackId) throws SQLException {
+        String query = "SELECT message FROM feedback WHERE id = '" + feedbackId  + "'";
+        List<String> feedback = new ArrayList<>();
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()){
+                feedback.add(resultSet.getString(1));
+            }
+        }
+        return feedback;
     }
 }
