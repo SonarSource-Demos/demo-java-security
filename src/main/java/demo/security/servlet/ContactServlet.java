@@ -40,7 +40,7 @@ public class ContactServlet extends HttpServlet {
             out.println("</body></html>");
             out.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error retrieving feedback");
         }
     }
     
@@ -76,7 +76,7 @@ public class ContactServlet extends HttpServlet {
             out.println("</body></html>");
             out.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error saving feedback");
         }
     }
 }
