@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/users")
@@ -27,8 +28,8 @@ public class UserServlet extends HttpServlet {
                         out.print("<h2>User "+result+ "</h2>");
             });
             out.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new ServletException("Database error", e);
         }
 
     }
@@ -61,8 +62,8 @@ public class UserServlet extends HttpServlet {
                 out.print("<h2>User "+result+ "</h2>");
             });
             out.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new ServletException("Database error", e);
         }
     }
 }

@@ -13,25 +13,34 @@ public class DBUtils {
                 "mYJDBCUrl", "myJDBCUser", "myJDBCPass");
     }
 
-    public List<String> findUsers(String user) throws Exception {
+    public List<String> findUsers(String user) throws SQLException {
         String query = "SELECT userid FROM users WHERE username = '" + user  + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        List<String> users = new ArrayList<String>();
-        while (resultSet.next()){
-            users.add(resultSet.getString(0));
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            List<String> users = new ArrayList<>();
+            while (resultSet.next()){
+                users.add(resultSet.getString(1));
+            }
+            return users;
         }
-        return users;
     }
 
-    public List<String> findItem(String itemId) throws Exception {
+    public List<String> findItem(String itemId) throws SQLException {
         String query = "SELECT item_id FROM items WHERE item_id = '" + itemId  + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        List<String> items = new ArrayList<String>();
-        while (resultSet.next()){
-            items.add(resultSet.getString(0));
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            List<String> items = new ArrayList<>();
+            while (resultSet.next()){
+                items.add(resultSet.getString(1));
+            }
+            return items;
         }
-        return items;
+    }
+
+    public void saveFeedback(String name, String email, String subject, String message) throws SQLException {
+        String query = "INSERT INTO feedback (name, email, subject, message) VALUES ('" + name + "', '" + email + "', '" + subject + "', '" + message + "')";
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(query);
+        }
     }
 }
