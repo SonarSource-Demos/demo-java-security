@@ -176,7 +176,7 @@ public class AdminFeedbackServlet extends HttpServlet {
         }
     }
     
-    private void displayFilteredFeedback(PrintWriter out, FeedbackDAO dao, String filterCondition) throws Exception {
+    private void displayFilteredFeedback(PrintWriter out, FeedbackDAO dao, String filterCondition) throws SQLException {
         List<FeedbackRecord> results = dao.getRecentFeedback(100, filterCondition);
         
         out.println("<h2>Filtered Results</h2>");
@@ -192,7 +192,7 @@ public class AdminFeedbackServlet extends HttpServlet {
         }
     }
     
-    private void displayRecentFeedback(PrintWriter out, FeedbackDAO dao) throws Exception {
+    private void displayRecentFeedback(PrintWriter out, FeedbackDAO dao) throws SQLException {
         List<FeedbackRecord> recent = dao.getRecentFeedback(20, null);
         
         out.println("<h2>Recent Feedback (Latest 20)</h2>");

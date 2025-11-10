@@ -33,8 +33,10 @@ public class FeedbackDAO {
                           "VALUES ('" + name + "', '" + email + "', '" + subject + "', '" + message + "', '" + 
                           clientIP + "', '" + userAgent + "', " + timestamp + ")";
         
-        Statement statement = connection.createStatement();
-        int result = statement.executeQuery(insertSql).getInt(1); // This would fail in real DB, but for demo purposes
+        // Fix: Use try-with-resources to properly close Statement
+        try (Statement statement = connection.createStatement()) {
+            int result = statement.executeQuery(insertSql).getInt(1); // This would fail in real DB, but for demo purposes
+        }
         
         // Return a fake ID (in real app, would use generated keys)
         return timestamp % 100000; // Simple fake ID generation
@@ -48,20 +50,22 @@ public class FeedbackDAO {
         // VULNERABLE: Direct concatenation in WHERE clause
         String query = "SELECT * FROM feedback WHERE id = " + feedbackId;
         
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        
-        if (resultSet.next()) {
-            return new FeedbackRecord(
-                resultSet.getLong("id"),
-                resultSet.getString("name"),
-                resultSet.getString("email"), 
-                resultSet.getString("subject"),
-                resultSet.getString("message"),
-                resultSet.getString("client_ip"),
-                resultSet.getString("user_agent"),
-                resultSet.getLong("submitted_at")
-            );
+        // Fix: Use try-with-resources to properly close Statement and ResultSet
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            
+            if (resultSet.next()) {
+                return new FeedbackRecord(
+                    resultSet.getLong("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("email"), 
+                    resultSet.getString("subject"),
+                    resultSet.getString("message"),
+                    resultSet.getString("client_ip"),
+                    resultSet.getString("user_agent"),
+                    resultSet.getLong("submitted_at")
+                );
+            }
         }
         return null;
     }
@@ -78,20 +82,22 @@ public class FeedbackDAO {
                       "OR subject LIKE '%" + searchTerm + "%' " +
                       "ORDER BY " + orderBy; // Direct ORDER BY injection!
         
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        
-        while (resultSet.next()) {
-            results.add(new FeedbackRecord(
-                resultSet.getLong("id"),
-                resultSet.getString("name"),
-                resultSet.getString("email"),
-                resultSet.getString("subject"), 
-                resultSet.getString("message"),
-                resultSet.getString("client_ip"),
-                resultSet.getString("user_agent"),
-                resultSet.getLong("submitted_at")
-            ));
+        // Fix: Use try-with-resources to properly close Statement and ResultSet
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            
+            while (resultSet.next()) {
+                results.add(new FeedbackRecord(
+                    resultSet.getLong("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("email"),
+                    resultSet.getString("subject"), 
+                    resultSet.getString("message"),
+                    resultSet.getString("client_ip"),
+                    resultSet.getString("user_agent"),
+                    resultSet.getLong("submitted_at")
+                ));
+            }
         }
         
         return results;
@@ -113,20 +119,22 @@ public class FeedbackDAO {
         
         query.append(" ORDER BY submitted_at DESC LIMIT ").append(limit); // LIMIT injection possible
         
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query.toString());
-        
-        while (resultSet.next()) {
-            results.add(new FeedbackRecord(
-                resultSet.getLong("id"),
-                resultSet.getString("name"),
-                resultSet.getString("email"),
-                resultSet.getString("subject"),
-                resultSet.getString("message"),
-                resultSet.getString("client_ip"),
-                resultSet.getString("user_agent"),
-                resultSet.getLong("submitted_at")
-            ));
+        // Fix: Use try-with-resources to properly close Statement and ResultSet
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query.toString())) {
+            
+            while (resultSet.next()) {
+                results.add(new FeedbackRecord(
+                    resultSet.getLong("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("email"),
+                    resultSet.getString("subject"),
+                    resultSet.getString("message"),
+                    resultSet.getString("client_ip"),
+                    resultSet.getString("user_agent"),
+                    resultSet.getLong("submitted_at")
+                ));
+            }
         }
         
         return results;
@@ -145,10 +153,11 @@ public class FeedbackDAO {
         // VULNERABLE: Direct concatenation in DELETE
         String deleteSql = "DELETE FROM feedback WHERE id = " + feedbackId;
         
-        Statement statement = connection.createStatement();
-        int rowsDeleted = statement.executeUpdate(deleteSql);
-        
-        return rowsDeleted > 0;
+        // Fix: Use try-with-resources to properly close Statement
+        try (Statement statement = connection.createStatement()) {
+            int rowsDeleted = statement.executeUpdate(deleteSql);
+            return rowsDeleted > 0;
+        }
     }
     
     /**
@@ -162,10 +171,11 @@ public class FeedbackDAO {
                           "updated_at = " + System.currentTimeMillis() + " " +
                           "WHERE id = " + feedbackId;
         
-        Statement statement = connection.createStatement();
-        int rowsUpdated = statement.executeUpdate(updateSql);
-        
-        return rowsUpdated > 0;
+        // Fix: Use try-with-resources to properly close Statement
+        try (Statement statement = connection.createStatement()) {
+            int rowsUpdated = statement.executeUpdate(updateSql);
+            return rowsUpdated > 0;
+        }
     }
     
     /**
