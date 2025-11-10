@@ -33,9 +33,7 @@ public class ContactServlet extends HttpServlet {
             out.println("<html><body>");
             out.println("<h1>Contact Feedback</h1>");
             
-            feedbackList.forEach((feedback) -> {
-                out.println("<div>" + feedback + "</div>");
-            });
+            feedbackList.forEach(feedback -> out.println("<div>" + feedback + "</div>"));
             
             out.println("</body></html>");
             out.close();

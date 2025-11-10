@@ -36,11 +36,12 @@ public class DBUtils {
 
     public List<String> findContactFeedback(String feedbackId) throws Exception {
         String query = "SELECT name, email, message FROM contact_feedback WHERE id = '" + feedbackId + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        List<String> feedback = new ArrayList<String>();
-        while (resultSet.next()){
-            feedback.add(resultSet.getString(1) + " - " + resultSet.getString(2) + ": " + resultSet.getString(3));
+        List<String> feedback = new ArrayList<>();
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()){
+                feedback.add(resultSet.getString(1) + " - " + resultSet.getString(2) + ": " + resultSet.getString(3));
+            }
         }
         return feedback;
     }
@@ -48,7 +49,8 @@ public class DBUtils {
     public void saveContactFeedback(String name, String email, String message, String attachment) throws Exception {
         String query = "INSERT INTO contact_feedback (name, email, message, attachment) VALUES ('" + 
                       name + "', '" + email + "', '" + message + "', '" + attachment + "')";
-        Statement statement = connection.createStatement();
-        statement.executeUpdate(query);
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(query);
+        }
     }
 }
