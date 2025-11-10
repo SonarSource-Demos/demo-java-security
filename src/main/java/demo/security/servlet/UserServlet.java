@@ -31,6 +31,13 @@ public class UserServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
 
+        for (int i = 0 ; i < 1000; i++) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private SessionHeader getSessionHeader(HttpServletRequest request) {
