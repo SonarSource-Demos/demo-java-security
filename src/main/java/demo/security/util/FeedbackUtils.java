@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 public class FeedbackUtils {
@@ -53,7 +53,7 @@ public class FeedbackUtils {
 
     // LDAP Injection vulnerability
     public List<String> findUserByEmail(String email) throws NamingException {
-        HashMap<String, String> env = new HashMap<>();
+        Hashtable<String, String> env = new Hashtable<>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, "ldap://localhost:389");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
