@@ -1,4 +1,8 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Contact Feedback Form</title>
+</head>
 <body>
 <h2>Contact Feedback Form</h2>
 <form action="contact" method="post">

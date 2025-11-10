@@ -9,12 +9,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @WebServlet("/contact")
 public class ContactServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(ContactServlet.class.getName());
+    private static final String HTML_HEADER = "<html><body>";
+    private static final String HTML_FOOTER = "</body></html>";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -26,18 +30,18 @@ public class ContactServlet extends HttpServlet {
             try {
                 DBUtils db = new DBUtils();
                 List<String> feedback = db.findContactFeedback(feedbackId);
-                out.println("<html><body>");
+                out.println(HTML_HEADER);
                 out.println("<h1>Contact Feedback</h1>");
-                feedback.forEach(item -> {
-                    out.println("<p>" + item + "</p>");
-                });
-                out.println("</body></html>");
-            } catch (Exception e) {
-                logger.severe("Error retrieving feedback: " + e.getMessage());
+                feedback.forEach(item -> out.println("<p>" + item + "</p>"));
+                out.println(HTML_FOOTER);
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, "Database connection error", e);
                 throw new ServletException("Database error", e);
+            } catch (Exception e) {
+                throw new ServletException("Error retrieving feedback", e);
             }
         } else {
-            out.println("<html><body>");
+            out.println(HTML_HEADER);
             out.println("<h1>Contact Form</h1>");
             out.println("<form method='post'>");
             out.println("Name: <input type='text' name='name'/><br/>");
@@ -45,7 +49,7 @@ public class ContactServlet extends HttpServlet {
             out.println("Message: <textarea name='message'></textarea><br/>");
             out.println("<input type='submit' value='Submit'/>");
             out.println("</form>");
-            out.println("</body></html>");
+            out.println(HTML_FOOTER);
         }
         out.close();
     }
@@ -63,18 +67,19 @@ public class ContactServlet extends HttpServlet {
             DBUtils db = new DBUtils();
             db.saveContactFeedback(name, email, message);
 
-            out.println("<html><body>");
+            out.println(HTML_HEADER);
             out.println("<h1>Thank You!</h1>");
             out.println("<p>Thank you, " + name + "!</p>");
             out.println("<p>We received your message:</p>");
             out.println("<p>" + message + "</p>");
             out.println("<p>We'll respond to: " + email + "</p>");
-            out.println("</body></html>");
-        } catch (Exception e) {
-            logger.severe("Error saving feedback: " + e.getMessage());
+            out.println(HTML_FOOTER);
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database connection error", e);
             throw new ServletException("Database error", e);
+        } catch (Exception e) {
+            throw new ServletException("Error saving feedback", e);
         }
         out.close();
     }
 }
-
