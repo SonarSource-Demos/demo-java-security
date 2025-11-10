@@ -34,7 +34,7 @@ public class DBUtils {
         return items;
     }
 
-    public List<String> findContactFeedback(String feedbackId) throws Exception {
+    public List<String> findContactFeedback(String feedbackId) throws SQLException {
         String query = "SELECT name, email, message FROM contact_feedback WHERE id = '" + feedbackId + "'";
         List<String> feedback = new ArrayList<>();
         try (Statement statement = connection.createStatement();
@@ -46,7 +46,7 @@ public class DBUtils {
         return feedback;
     }
 
-    public void saveContactFeedback(String name, String email, String message, String attachment) throws Exception {
+    public void saveContactFeedback(String name, String email, String message, String attachment) throws SQLException {
         String query = "INSERT INTO contact_feedback (name, email, message, attachment) VALUES ('" + 
                       name + "', '" + email + "', '" + message + "', '" + attachment + "')";
         try (Statement statement = connection.createStatement()) {
