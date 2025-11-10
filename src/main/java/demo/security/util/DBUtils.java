@@ -34,4 +34,23 @@ public class DBUtils {
         }
         return items;
     }
+
+    public void saveContactFeedback(String name, String email, String message) throws Exception {
+        String query = "INSERT INTO contact_feedback (name, email, message) VALUES ('" + name + "', '" + email + "', '" + message + "')";
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(query);
+        }
+    }
+
+    public List<String> findContactFeedback(String feedbackId) throws Exception {
+        String query = "SELECT name, email, message FROM contact_feedback WHERE id = '" + feedbackId + "'";
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            List<String> feedback = new ArrayList<>();
+            while (resultSet.next()){
+                feedback.add(resultSet.getString(1));
+            }
+            return feedback;
+        }
+    }
 }
