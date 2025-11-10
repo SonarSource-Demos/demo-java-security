@@ -11,12 +11,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @WebServlet("/contact")
 public class ContactServlet extends HttpServlet {
-    private static final Logger logger = Logger.getLogger(ContactServlet.class.getName());
     private static final String HTML_HEADER = "<html><body>";
     private static final String HTML_FOOTER = "</body></html>";
 
@@ -35,8 +32,7 @@ public class ContactServlet extends HttpServlet {
                 feedback.forEach(item -> out.println("<p>" + item + "</p>"));
                 out.println(HTML_FOOTER);
             } catch (SQLException e) {
-                logger.log(Level.SEVERE, "Database connection error", e);
-                throw new ServletException("Database error", e);
+                throw new ServletException("Database connection error", e);
             } catch (Exception e) {
                 throw new ServletException("Error retrieving feedback", e);
             }
@@ -75,8 +71,7 @@ public class ContactServlet extends HttpServlet {
             out.println("<p>We'll respond to: " + email + "</p>");
             out.println(HTML_FOOTER);
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Database connection error", e);
-            throw new ServletException("Database error", e);
+            throw new ServletException("Database connection error", e);
         } catch (Exception e) {
             throw new ServletException("Error saving feedback", e);
         }
