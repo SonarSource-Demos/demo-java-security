@@ -3,6 +3,7 @@ package demo.security.util;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -32,5 +33,11 @@ public class WebUtils {
                 }
             }
         }
+    }
+
+    public static String resolveAttachmentPath(String filename) {
+        String baseDir = "/var/uploads/";
+        File file = new File(baseDir + filename);
+        return file.getAbsolutePath();
     }
 }

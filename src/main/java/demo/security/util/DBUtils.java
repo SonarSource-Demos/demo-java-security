@@ -1,6 +1,5 @@
 package demo.security.util;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,5 +32,23 @@ public class DBUtils {
             items.add(resultSet.getString(0));
         }
         return items;
+    }
+
+    public List<String> findContactFeedback(String feedbackId) throws Exception {
+        String query = "SELECT name, email, message FROM contact_feedback WHERE id = '" + feedbackId + "'";
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        List<String> feedback = new ArrayList<String>();
+        while (resultSet.next()){
+            feedback.add(resultSet.getString(1) + " - " + resultSet.getString(2) + ": " + resultSet.getString(3));
+        }
+        return feedback;
+    }
+
+    public void saveContactFeedback(String name, String email, String message, String attachment) throws Exception {
+        String query = "INSERT INTO contact_feedback (name, email, message, attachment) VALUES ('" + 
+                      name + "', '" + email + "', '" + message + "', '" + attachment + "')";
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(query);
     }
 }
