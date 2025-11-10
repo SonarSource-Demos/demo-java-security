@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Contact Feedback Form</title>
     <meta charset="UTF-8">
