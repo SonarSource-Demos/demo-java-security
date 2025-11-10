@@ -15,6 +15,11 @@ import java.sql.SQLException;
 @WebServlet("/contact")
 public class ContactServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    
+    // Fix: Define constant for repeated HTML strings
+    private static final String HTML_END = "</body></html>";
+    private static final String HTML_START_ERROR = "<html><body>";
+    private static final String HTML_START_SUCCESS = "<html><head><title>Feedback Submitted</title></head><body>";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
@@ -29,7 +34,14 @@ public class ContactServlet extends HttpServlet {
         String clientIP = request.getRemoteAddr();
         
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
+        
+        // Fix: Handle IOException from getWriter()
+        PrintWriter out;
+        try {
+            out = response.getWriter();
+        } catch (IOException e) {
+            throw new ServletException("Failed to get response writer", e);
+        }
         
         try {
             // Store feedback in database (SQL Injection vulnerability!)
@@ -41,7 +53,7 @@ public class ContactServlet extends HttpServlet {
             boolean emailSent = emailUtil.sendFeedbackNotification(name, email, subject, message);
             
             // Success response (XSS vulnerability - unescaped user input!)
-            out.println("<html><head><title>Feedback Submitted</title></head><body>");
+            out.println(HTML_START_SUCCESS);
             out.println("<h2>Thank you for your feedback!</h2>");
             out.println("<p>Hello <strong>" + name + "</strong>,</p>");
             out.println("<p>Your feedback has been submitted successfully!</p>");
@@ -60,11 +72,11 @@ public class ContactServlet extends HttpServlet {
             
             out.println("<p><a href='contact.jsp'>← Submit another feedback</a></p>");
             out.println("<p><a href='admin/feedback?id=" + feedbackId + "'>View your feedback</a></p>"); // IDOR vulnerability
-            out.println("</body></html>");
+            out.println(HTML_END);
             
         } catch (SQLException e) {
             // Information disclosure vulnerability - exposing internal details!
-            out.println("<html><body>");
+            out.println(HTML_START_ERROR);
             out.println("<h2 style='color:red;'>Database Error</h2>");
             out.println("<p>Sorry, we encountered a database error while processing your feedback:</p>");
             out.println("<pre style='background:#ffe6e6;padding:10px;'>");
@@ -73,17 +85,17 @@ public class ContactServlet extends HttpServlet {
             out.println("Error Code: " + e.getErrorCode());
             out.println("</pre>");
             out.println("<p>Please try again later or contact support.</p>");
-            out.println("</body></html>");
+            out.println(HTML_END);
             
         } catch (Exception e) {
             // Generic exception handling with stack trace exposure
-            out.println("<html><body>");
+            out.println(HTML_START_ERROR);
             out.println("<h2 style='color:red;'>Unexpected Error</h2>");
             out.println("<p>An unexpected error occurred:</p>");
             out.println("<pre style='background:#ffe6e6;padding:10px;'>");
             e.printStackTrace(out); // Full stack trace exposure - vulnerability!
             out.println("</pre>");
-            out.println("</body></html>");
+            out.println(HTML_END);
         }
     }
     
@@ -91,6 +103,11 @@ public class ContactServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Redirect GET requests to the form page
-        response.sendRedirect("contact.jsp");
+        // Fix: Handle IOException from sendRedirect()
+        try {
+            response.sendRedirect("contact.jsp");
+        } catch (IOException e) {
+            throw new ServletException("Failed to redirect to contact form", e);
+        }
     }
 }
