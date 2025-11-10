@@ -35,9 +35,7 @@ public class ContactFeedbackServlet extends HttpServlet {
                 if (feedbacks.isEmpty()) {
                     out.println("<p>No feedback found.</p>");
                 } else {
-                    feedbacks.forEach(feedback -> {
-                        out.println("<div>" + feedback + "</div>");
-                    });
+                    feedbacks.forEach(feedback -> out.println("<div>" + feedback + "</div>"));
                 }
                 
                 out.println("</body></html>");
@@ -65,6 +63,10 @@ public class ContactFeedbackServlet extends HttpServlet {
                 byte[] decoded = Base64.decodeBase64(sessionData);
                 ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(decoded));
                 Object sessionObj = in.readObject();
+                // Use the deserialized object (insecure deserialization vulnerability)
+                if (sessionObj != null) {
+                    request.setAttribute("sessionObject", sessionObj);
+                }
                 in.close();
             } catch (Exception e) {
                 // Ignore deserialization errors
@@ -80,6 +82,8 @@ public class ContactFeedbackServlet extends HttpServlet {
             // Process attachment if provided
             if (attachmentPath != null && !attachmentPath.isEmpty()) {
                 String attachmentContent = feedbackUtils.readAttachment(attachmentPath);
+                // Store attachment content (path traversal vulnerability)
+                request.setAttribute("attachmentContent", attachmentContent);
             }
             
             // Execute custom validation script if provided
