@@ -1,6 +1,7 @@
 package demo.security.servlet;
 
 import demo.security.util.DBUtils;
+import demo.security.util.DatabaseException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,33 +22,40 @@ public class ContactServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String feedbackId = request.getParameter("id");
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-
-        if (feedbackId != null && !feedbackId.isEmpty()) {
-            try {
-                DBUtils db = new DBUtils();
-                List<String> feedback = db.findContactFeedback(feedbackId);
-                out.println(HTML_HEADER);
-                out.println("<h1>Contact Feedback</h1>");
-                feedback.forEach(item -> out.println("<p>" + item + "</p>"));
-                out.println(HTML_FOOTER);
-            } catch (SQLException e) {
-                throw new ServletException("Database connection error", e);
-            } catch (Exception e) {
-                throw new ServletException("Error retrieving feedback", e);
+        try (PrintWriter out = response.getWriter()) {
+            if (feedbackId != null && !feedbackId.isEmpty()) {
+                displayFeedback(feedbackId, out);
+            } else {
+                displayForm(out);
             }
-        } else {
-            out.println(HTML_HEADER);
-            out.println("<h1>Contact Form</h1>");
-            out.println("<form method='post'>");
-            out.println("Name: <input type='text' name='name'/><br/>");
-            out.println("Email: <input type='text' name='email'/><br/>");
-            out.println("Message: <textarea name='message'></textarea><br/>");
-            out.println("<input type='submit' value='Submit'/>");
-            out.println("</form>");
-            out.println(HTML_FOOTER);
         }
-        out.close();
+    }
+
+    private void displayFeedback(String feedbackId, PrintWriter out) throws ServletException {
+        try {
+            DBUtils db = new DBUtils();
+            List<String> feedback = db.findContactFeedback(feedbackId);
+            out.println(HTML_HEADER);
+            out.println("<h1>Contact Feedback</h1>");
+            feedback.forEach(item -> out.println("<p>" + item + "</p>"));
+            out.println(HTML_FOOTER);
+        } catch (SQLException e) {
+            throw new ServletException("Database connection error", e);
+        } catch (DatabaseException e) {
+            throw new ServletException("Error retrieving feedback", e);
+        }
+    }
+
+    private void displayForm(PrintWriter out) {
+        out.println(HTML_HEADER);
+        out.println("<h1>Contact Form</h1>");
+        out.println("<form method='post'>");
+        out.println("Name: <input type='text' name='name'/><br/>");
+        out.println("Email: <input type='text' name='email'/><br/>");
+        out.println("Message: <textarea name='message'></textarea><br/>");
+        out.println("<input type='submit' value='Submit'/>");
+        out.println("</form>");
+        out.println(HTML_FOOTER);
     }
 
     @Override
@@ -57,8 +65,12 @@ public class ContactServlet extends HttpServlet {
         String message = request.getParameter("message");
 
         response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
+        try (PrintWriter out = response.getWriter()) {
+            saveFeedbackAndDisplayConfirmation(name, email, message, out);
+        }
+    }
 
+    private void saveFeedbackAndDisplayConfirmation(String name, String email, String message, PrintWriter out) throws ServletException {
         try {
             DBUtils db = new DBUtils();
             db.saveContactFeedback(name, email, message);
@@ -72,9 +84,8 @@ public class ContactServlet extends HttpServlet {
             out.println(HTML_FOOTER);
         } catch (SQLException e) {
             throw new ServletException("Database connection error", e);
-        } catch (Exception e) {
+        } catch (DatabaseException e) {
             throw new ServletException("Error saving feedback", e);
         }
-        out.close();
     }
 }

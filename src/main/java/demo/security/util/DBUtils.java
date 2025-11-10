@@ -35,14 +35,16 @@ public class DBUtils {
         return items;
     }
 
-    public void saveContactFeedback(String name, String email, String message) throws Exception {
+    public void saveContactFeedback(String name, String email, String message) throws DatabaseException {
         String query = "INSERT INTO contact_feedback (name, email, message) VALUES ('" + name + "', '" + email + "', '" + message + "')";
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(query);
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to save contact feedback", e);
         }
     }
 
-    public List<String> findContactFeedback(String feedbackId) throws Exception {
+    public List<String> findContactFeedback(String feedbackId) throws DatabaseException {
         String query = "SELECT name, email, message FROM contact_feedback WHERE id = '" + feedbackId + "'";
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
@@ -51,6 +53,8 @@ public class DBUtils {
                 feedback.add(resultSet.getString(1));
             }
             return feedback;
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to retrieve contact feedback", e);
         }
     }
 }
