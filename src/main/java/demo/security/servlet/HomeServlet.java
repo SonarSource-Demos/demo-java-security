@@ -20,10 +20,10 @@ public class HomeServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        String name = request.getParameter("name").trim();
+        String name = request.getParameter("name");
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        out.print("<h2>Hello "+name+ "</h2>");
+        out.print("<h2>Hello " + org.apache.commons.text.StringEscapeUtils.escapeHtml4(name) + "</h2>");
         out.close();
     }
 
