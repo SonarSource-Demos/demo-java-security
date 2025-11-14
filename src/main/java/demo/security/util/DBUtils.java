@@ -35,46 +35,50 @@ public class DBUtils {
     }
 
     // SQL Injection vulnerability - feedback search
-    public List<String> findFeedback(String feedbackId) throws Exception {
+    public List<String> findFeedback(String feedbackId) throws SQLException {
         String query = "SELECT feedback_text FROM feedback WHERE id = '" + feedbackId + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        List<String> feedbacks = new ArrayList<String>();
-        while (resultSet.next()){
-            feedbacks.add(resultSet.getString(0));
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            List<String> feedbacks = new ArrayList<>();
+            while (resultSet.next()){
+                feedbacks.add(resultSet.getString(1));
+            }
+            return feedbacks;
         }
-        return feedbacks;
     }
 
     // SQL Injection vulnerability - store feedback
-    public void storeFeedback(String name, String email, String message, String category) throws Exception {
+    public void storeFeedback(String name, String email, String message, String category) throws SQLException {
         String query = "INSERT INTO feedback (name, email, message, category) VALUES ('" + 
                        name + "', '" + email + "', '" + message + "', '" + category + "')";
-        Statement statement = connection.createStatement();
-        statement.executeUpdate(query);
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(query);
+        }
     }
 
     // SQL Injection vulnerability - get all feedbacks
-    public List<String> getAllFeedbacks() throws Exception {
+    public List<String> getAllFeedbacks() throws SQLException {
         String query = "SELECT feedback_text FROM feedback";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        List<String> feedbacks = new ArrayList<String>();
-        while (resultSet.next()){
-            feedbacks.add(resultSet.getString(0));
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            List<String> feedbacks = new ArrayList<>();
+            while (resultSet.next()){
+                feedbacks.add(resultSet.getString(1));
+            }
+            return feedbacks;
         }
-        return feedbacks;
     }
 
     // SQL Injection vulnerability - search feedback by category
-    public List<String> searchFeedbackByCategory(String category) throws Exception {
+    public List<String> searchFeedbackByCategory(String category) throws SQLException {
         String query = "SELECT feedback_text FROM feedback WHERE category = '" + category + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        List<String> feedbacks = new ArrayList<String>();
-        while (resultSet.next()){
-            feedbacks.add(resultSet.getString(0));
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            List<String> feedbacks = new ArrayList<>();
+            while (resultSet.next()){
+                feedbacks.add(resultSet.getString(1));
+            }
+            return feedbacks;
         }
-        return feedbacks;
     }
 }

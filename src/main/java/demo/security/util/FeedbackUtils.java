@@ -15,6 +15,10 @@ public class FeedbackUtils {
     
     private static final String BASE_PATH = "/tmp/feedback/";
     
+    private FeedbackUtils() {
+        // Utility class
+    }
+    
     // Path Traversal vulnerability - user input directly used in file path
     public static String readAttachment(String filename) throws IOException {
         File file = new File(BASE_PATH + filename);
@@ -36,8 +40,8 @@ public class FeedbackUtils {
     
     // Weak cryptography vulnerability - using DES and weak key
     public static byte[] encryptFeedback(String message) throws Exception {
-        String key = "weakkey1";
-        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "DES");
+        byte[] keyBytes = "weakkey1".getBytes();
+        SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "DES");
         Cipher cipher = Cipher.getInstance("DES");
         cipher.init(Cipher.ENCRYPT_MODE, keySpec);
         return cipher.doFinal(message.getBytes());

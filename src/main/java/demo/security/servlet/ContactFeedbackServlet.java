@@ -13,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/contact")
@@ -33,10 +34,10 @@ public class ContactFeedbackServlet extends HttpServlet {
             if (feedbackId != null) {
                 List<String> feedbacks = db.findFeedback(feedbackId);
                 out.println("<h2>Feedback Details</h2>");
-                feedbacks.forEach((feedback) -> {
+                feedbacks.forEach(feedback ->
                     // XSS vulnerability - unsanitized output
-                    out.print("<div class='feedback'>" + feedback + "</div>");
-                });
+                    out.print("<div class='feedback'>" + feedback + "</div>")
+                );
             }
             
             // Path Traversal vulnerability - handle attachment download
@@ -48,13 +49,13 @@ public class ContactFeedbackServlet extends HttpServlet {
             // Display all feedbacks
             List<String> allFeedbacks = db.getAllFeedbacks();
             out.println("<h2>All Feedback</h2>");
-            allFeedbacks.forEach((feedback) -> {
-                out.print("<p>" + feedback + "</p>");
-            });
+            allFeedbacks.forEach(feedback ->
+                out.print("<p>" + feedback + "</p>")
+            );
             
             out.close();
-        } catch (Exception e) {
-            throw new ServletException(e);
+        } catch (SQLException e) {
+            throw new ServletException("Database error", e);
         }
     }
     
@@ -107,8 +108,10 @@ public class ContactFeedbackServlet extends HttpServlet {
             out.println("<p>Email: " + email + "</p>");
             out.close();
             
+        } catch (SQLException e) {
+            throw new ServletException("Database error", e);
         } catch (Exception e) {
-            throw new ServletException(e);
+            throw new ServletException("Processing error", e);
         }
     }
 }
