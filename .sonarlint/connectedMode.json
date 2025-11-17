@@ -1,0 +1,4 @@
+{
+    "sonarQubeUri": "https://nautilus.sonarqube.org",
+    "projectKey": "demo:java-security"
+}
