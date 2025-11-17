@@ -4,4 +4,29 @@
 
 <web-app>
     <display-name>Archetype Created Web Application</display-name>
+    
+    <!-- Contact Feedback Servlet Configuration -->
+    <servlet>
+        <servlet-name>ContactFeedbackServlet</servlet-name>
+        <servlet-class>demo.security.servlet.ContactFeedbackServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>ContactFeedbackServlet</servlet-name>
+        <url-pattern>/contact-feedback</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Session configuration with security issues -->
+    <session-config>
+        <!-- Short session timeout - security issue -->
+        <session-timeout>5</session-timeout>
+        <!-- Missing secure and httpOnly flags for cookies -->
+    </session-config>
+    
+    <!-- Welcome file list -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>contact-feedback.jsp</welcome-file>
+    </welcome-file-list>
 </web-app>
