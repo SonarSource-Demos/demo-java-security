@@ -8,7 +8,7 @@
 <%@ page import="java.io.ByteArrayOutputStream"%>
 <%@ page import="java.util.Base64"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Contact Feedback Form</title>
@@ -139,10 +139,10 @@
         %>
         
         <div class="form-group">
-            <label>CAPTCHA (Optional):</label>
+            <label for="captcha-input">CAPTCHA (Optional):</label>
             <div class="captcha-container">
                 <img src="data:image/png;base64,<%= base64Image %>" alt="CAPTCHA" class="captcha-image"/>
-                <input type="text" name="captcha" placeholder="Enter CAPTCHA" style="width: auto;">
+                <input type="text" id="captcha-input" name="captcha" placeholder="Enter CAPTCHA" style="width: auto;">
             </div>
         </div>
         
