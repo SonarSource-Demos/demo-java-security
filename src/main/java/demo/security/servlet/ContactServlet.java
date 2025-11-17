@@ -31,13 +31,7 @@ public class ContactServlet extends HttpServlet {
         String userCaptcha = request.getParameter("captcha");
         
         response.setContentType(CONTENT_TYPE_HTML);
-        PrintWriter out;
-        try {
-            out = response.getWriter();
-        } catch (IOException e) {
-            logger.severe("Error getting response writer: " + e.getMessage());
-            throw e;
-        }
+        PrintWriter out = response.getWriter();
         
         // Optional CAPTCHA validation - vulnerable to bypass
         if (storedCaptcha != null && !storedCaptcha.isEmpty() && 
@@ -91,22 +85,9 @@ public class ContactServlet extends HttpServlet {
                 out.println("<pre>" + feedbackContent + "</pre>");
                 out.println("</body></html>");
                 out.close();
-            } catch (IOException e) {
-                logger.severe("Error reading feedback: " + e.getMessage());
-                try {
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                } catch (IOException ioException) {
-                    logger.severe("Error sending error response: " + ioException.getMessage());
-                    throw ioException;
-                }
             } catch (Exception e) {
                 logger.severe("Error reading feedback: " + e.getMessage());
-                try {
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                } catch (IOException ioException) {
-                    logger.severe("Error sending error response: " + ioException.getMessage());
-                    throw ioException;
-                }
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } else {
             // Vulnerable: Deserialization attack through custom header
@@ -122,30 +103,12 @@ public class ContactServlet extends HttpServlet {
                     PrintWriter out = response.getWriter();
                     out.println("<html><body><h2>Feedback received: " + feedback.toString() + "</h2></body></html>");
                     out.close();
-                } catch (IOException e) {
-                    logger.severe("Error deserializing feedback: " + e.getMessage());
-                    try {
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    } catch (IOException ioException) {
-                        logger.severe("Error sending error response: " + ioException.getMessage());
-                        throw ioException;
-                    }
                 } catch (Exception e) {
                     logger.severe("Error deserializing feedback: " + e.getMessage());
-                    try {
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    } catch (IOException ioException) {
-                        logger.severe("Error sending error response: " + ioException.getMessage());
-                        throw ioException;
-                    }
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 }
             } else {
-                try {
-                    response.sendRedirect("contact.jsp");
-                } catch (IOException e) {
-                    logger.severe("Error redirecting: " + e.getMessage());
-                    throw e;
-                }
+                response.sendRedirect("contact.jsp");
             }
         }
     }
