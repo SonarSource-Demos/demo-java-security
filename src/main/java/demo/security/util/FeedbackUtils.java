@@ -155,9 +155,9 @@ public class FeedbackUtils {
     
     // Sensitive data exposure in logs
     public void logFeedback(String email, String message, String creditCard) {
-        LOGGER.info("Feedback received from: " + email);
-        LOGGER.info("Message: " + message);
-        LOGGER.warning("Credit Card: " + creditCard); // Sensitive data in logs
+        LOGGER.log(java.util.logging.Level.INFO, "Feedback received from: {0}", email);
+        LOGGER.log(java.util.logging.Level.INFO, "Message: {0}", message);
+        LOGGER.log(java.util.logging.Level.WARNING, "Credit Card: {0}", creditCard); // Sensitive data in logs
     }
     
     // Missing authentication check

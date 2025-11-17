@@ -24,40 +24,38 @@ public class ContactFeedbackServlet extends HttpServlet {
         String feedbackId = request.getParameter("id");
         String format = request.getParameter("format");
         
-        try {
-            // SQL Injection vulnerability - concatenating user input directly
-            Connection connection = DriverManager.getConnection(
+        try (Connection connection = DriverManager.getConnection(
                 "mYJDBCUrl", "myJDBCUser", "myJDBCPass");
+             Statement statement = connection.createStatement()) {
+            // SQL Injection vulnerability - concatenating user input directly
             String query = "SELECT * FROM feedback WHERE id = '" + feedbackId + "'";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            
-            response.setContentType(CONTENT_TYPE_HTML);
-            PrintWriter out = response.getWriter();
-            
-            while (resultSet.next()) {
-                String name = resultSet.getString("name");
-                String email = resultSet.getString("email");
-                String message = resultSet.getString("message");
+            try (ResultSet resultSet = statement.executeQuery(query)) {
+                response.setContentType(CONTENT_TYPE_HTML);
+                PrintWriter out = response.getWriter();
                 
-                // XSS vulnerability - outputting user data without escaping
-                out.print("<h2>Feedback from: " + name + "</h2>");
-                out.print("<p>Email: " + email + "</p>");
-                out.print("<div>" + message + "</div>");
+                while (resultSet.next()) {
+                    String name = resultSet.getString("name");
+                    String email = resultSet.getString("email");
+                    String message = resultSet.getString("message");
+                    
+                    // XSS vulnerability - outputting user data without escaping
+                    out.print("<h2>Feedback from: " + name + "</h2>");
+                    out.print("<p>Email: " + email + "</p>");
+                    out.print("<div>" + message + "</div>");
+                }
+                
+                // Path traversal vulnerability
+                if (format != null && format.equals("file")) {
+                    String filename = request.getParameter("filename");
+                    File file = new File("/var/feedback/" + filename);
+                    String content = new String(Files.readAllBytes(file.toPath()));
+                    out.print("<pre>" + content + "</pre>");
+                }
+                
+                out.close();
             }
-            
-            // Path traversal vulnerability
-            if (format != null && format.equals("file")) {
-                String filename = request.getParameter("filename");
-                File file = new File("/var/feedback/" + filename);
-                String content = new String(Files.readAllBytes(file.toPath()));
-                out.print("<pre>" + content + "</pre>");
-            }
-            
-            out.close();
-            connection.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ServletException("Error retrieving feedback", e);
         }
     }
 
@@ -76,12 +74,13 @@ public class ContactFeedbackServlet extends HttpServlet {
             String emailHash = Base64.encodeBase64String(hash);
             
             // SQL Injection in INSERT statement
-            Connection connection = DriverManager.getConnection(
-                "mYJDBCUrl", "myJDBCUser", "myJDBCPass");
-            String insertQuery = "INSERT INTO feedback (name, email, email_hash, message) VALUES ('" 
-                + name + "', '" + email + "', '" + emailHash + "', '" + message + "')";
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(insertQuery);
+            try (Connection connection = DriverManager.getConnection(
+                    "mYJDBCUrl", "myJDBCUser", "myJDBCPass");
+                 Statement statement = connection.createStatement()) {
+                String insertQuery = "INSERT INTO feedback (name, email, email_hash, message) VALUES ('" 
+                    + name + "', '" + email + "', '" + emailHash + "', '" + message + "')";
+                statement.executeUpdate(insertQuery);
+            }
             
             // Command injection vulnerability
             if (notifyCmd != null && !notifyCmd.isEmpty()) {
@@ -122,7 +121,6 @@ public class ContactFeedbackServlet extends HttpServlet {
             }
             
             out.close();
-            connection.close();
         } catch (Exception e) {
             throw new ServletException("Error saving feedback", e);
         }
