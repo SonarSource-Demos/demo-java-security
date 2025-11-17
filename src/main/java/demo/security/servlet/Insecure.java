@@ -43,6 +43,7 @@ public class Insecure {
 	  Statement statement = null;
 	  statement = connection.createStatement();
 	  ResultSet rs = statement.executeQuery("select userid from users WHERE username=" + user);
+	  System.out.printlin(rs);
 	  return rs.getString(0);
 	}
 
