@@ -23,9 +23,8 @@ public class ContactFeedbackServlet extends HttpServlet {
     // Insecure randomness - using java.util.Random instead of SecureRandom
     private final Random random = new Random();
     
-    // Hard-coded credentials - security vulnerabilities
+    // Hard-coded credentials - security vulnerability
     private static final String DB_PASSWORD = "password";
-    private static final String ADMIN_PASSWORD = "admin123";
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -36,18 +35,22 @@ public class ContactFeedbackServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         
-        if ("submit".equals(action)) {
-            handleFeedbackSubmission(request, response);
-        } else if ("search".equals(action)) {
-            handleFeedbackSearch(request, response);
-        } else if ("export".equals(action)) {
-            handleExportFeedback(request, response);
-        } else if ("upload".equals(action)) {
-            handleFileUpload(request, response);
-        } else if ("process".equals(action)) {
-            handleProcessXml(request, response);
-        } else if ("auth".equals(action)) {
-            handleAdminAuth(request, response);
+        try {
+            if ("submit".equals(action)) {
+                handleFeedbackSubmission(request, response);
+            } else if ("search".equals(action)) {
+                handleFeedbackSearch(request, response);
+            } else if ("export".equals(action)) {
+                handleExportFeedback(request, response);
+            } else if ("upload".equals(action)) {
+                handleFileUpload(request, response);
+            } else if ("process".equals(action)) {
+                handleProcessXml(request, response);
+            } else if ("auth".equals(action)) {
+                handleAdminAuth(request, response);
+            }
+        } catch (IOException e) {
+            throw new ServletException("Error processing request", e);
         }
     }
 
@@ -58,14 +61,13 @@ public class ContactFeedbackServlet extends HttpServlet {
         String feedback = request.getParameter("feedback");
         String category = request.getParameter("category");
         
-        try {
-            Connection connection = DriverManager.getConnection(
+        try (Connection connection = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/feedback", "root", DB_PASSWORD);
+             Statement statement = connection.createStatement()) {
             
             // SQL Injection vulnerability
             String query = "INSERT INTO feedback (name, email, feedback, category) VALUES ('" 
                     + name + "', '" + email + "', '" + feedback + "', '" + category + "')";
-            Statement statement = connection.createStatement();
             statement.executeUpdate(query);
             
             // XSS vulnerability - reflecting user input without sanitization
@@ -86,13 +88,12 @@ public class ContactFeedbackServlet extends HttpServlet {
     private void handleFeedbackSearch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String searchTerm = request.getParameter("search");
         
-        try {
-            Connection connection = DriverManager.getConnection(
+        try (Connection connection = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/feedback", "root", DB_PASSWORD);
+             Statement statement = connection.createStatement()) {
             
             // SQL Injection vulnerability
             String query = "SELECT * FROM feedback WHERE category = '" + searchTerm + "' OR name LIKE '%" + searchTerm + "%'";
-            Statement statement = connection.createStatement();
             statement.executeQuery(query);
             
             response.setContentType("text/html");
@@ -195,7 +196,7 @@ public class ContactFeedbackServlet extends HttpServlet {
         String email = request.getParameter("email");
         
         // Hard-coded credentials vulnerability
-        if ("admin".equals(username) && ADMIN_PASSWORD.equals(password)) {
+        if ("admin".equals(username) && DB_PASSWORD.equals(password)) {
             // Weak cryptographic hash - MD5
             String hashedPassword = hashPassword(password);
             
@@ -219,7 +220,7 @@ public class ContactFeedbackServlet extends HttpServlet {
             String filter = "(uid=" + username + ")";
             // Simulate LDAP search - in real code this would be used with DirContext.search()
             // Using filter for LDAP query would be vulnerable to LDAP injection
-            if (filter.length() > 0) {
+            if (!filter.isEmpty()) {
                 // LDAP search would be performed here
             }
         } catch (Exception e) {
