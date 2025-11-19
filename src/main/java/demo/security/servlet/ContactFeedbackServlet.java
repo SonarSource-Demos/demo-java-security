@@ -31,20 +31,15 @@ public class ContactFeedbackServlet extends HttpServlet {
         String feedback = request.getParameter(FIELD_FEEDBACK);
         String category = request.getParameter(FIELD_CATEGORY);
         
-        try {
-            ContactFeedbackUtil util = createUtil();
-            
-            // Store feedback with SQL injection vulnerability
-            String feedbackId = util.storeFeedback(name, email, feedback, category);
-            
-            // Retrieve and display feedback
-            List<Map<String, String>> feedbackList = util.getFeedbackByEmail(email);
-            
-            renderFeedbackSubmissionResponse(response, feedbackId, feedbackList);
-            
-        } catch (ContactFeedbackException | SQLException e) {
-            throw new ServletException("Error processing feedback", e);
-        }
+        ContactFeedbackUtil util = createUtil();
+        
+        // Store feedback with SQL injection vulnerability
+        String feedbackId = storeFeedback(util, name, email, feedback, category);
+        
+        // Retrieve and display feedback
+        List<Map<String, String>> feedbackList = getFeedbackByEmail(util, email);
+        
+        renderFeedbackSubmissionResponse(response, feedbackId, feedbackList);
     }
     
     @Override
@@ -52,29 +47,48 @@ public class ContactFeedbackServlet extends HttpServlet {
         String searchEmail = request.getParameter(FIELD_EMAIL);
         String searchCategory = request.getParameter(FIELD_CATEGORY);
         
+        ContactFeedbackUtil util = createUtil();
+        List<Map<String, String>> feedbackList = getFeedbackList(util, searchEmail, searchCategory);
+        
+        renderFeedbackSearchResponse(response, feedbackList);
+    }
+    
+    private ContactFeedbackUtil createUtil() throws ServletException {
         try {
-            ContactFeedbackUtil util = createUtil();
-            List<Map<String, String>> feedbackList = getFeedbackList(util, searchEmail, searchCategory);
-            
-            renderFeedbackSearchResponse(response, feedbackList);
-            
-        } catch (ContactFeedbackException | SQLException e) {
-            throw new ServletException("Error retrieving feedback", e);
+            return new ContactFeedbackUtil();
+        } catch (SQLException e) {
+            throw new ServletException("Database connection failed", e);
         }
     }
     
-    private ContactFeedbackUtil createUtil() throws SQLException {
-        return new ContactFeedbackUtil();
+    private String storeFeedback(ContactFeedbackUtil util, String name, String email, String feedback, String category) throws ServletException {
+        try {
+            return util.storeFeedback(name, email, feedback, category);
+        } catch (ContactFeedbackException e) {
+            throw new ServletException("Failed to store feedback", e);
+        }
     }
     
-    private List<Map<String, String>> getFeedbackList(ContactFeedbackUtil util, String searchEmail, String searchCategory) throws ContactFeedbackException {
-        if (searchEmail != null && !searchEmail.isEmpty()) {
-            // SQL injection vulnerability in search
-            return util.getFeedbackByEmail(searchEmail);
-        } else if (searchCategory != null && !searchCategory.isEmpty()) {
-            return util.getFeedbackByCategory(searchCategory);
-        } else {
-            return util.getAllFeedback();
+    private List<Map<String, String>> getFeedbackByEmail(ContactFeedbackUtil util, String email) throws ServletException {
+        try {
+            return util.getFeedbackByEmail(email);
+        } catch (ContactFeedbackException e) {
+            throw new ServletException("Failed to retrieve feedback", e);
+        }
+    }
+    
+    private List<Map<String, String>> getFeedbackList(ContactFeedbackUtil util, String searchEmail, String searchCategory) throws ServletException {
+        try {
+            if (searchEmail != null && !searchEmail.isEmpty()) {
+                // SQL injection vulnerability in search
+                return util.getFeedbackByEmail(searchEmail);
+            } else if (searchCategory != null && !searchCategory.isEmpty()) {
+                return util.getFeedbackByCategory(searchCategory);
+            } else {
+                return util.getAllFeedback();
+            }
+        } catch (ContactFeedbackException e) {
+            throw new ServletException("Failed to search feedback", e);
         }
     }
     
