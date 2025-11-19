@@ -32,10 +32,11 @@ public class ContactFeedbackUtil {
         }
     }
     
+    private static final String FEEDBACK_BASE_PATH = "/var/feedback/";
+    
     // Path Traversal vulnerability
     public String readFeedbackFile(String filename) throws IOException {
-        String basePath = "/var/feedback/";
-        String fullPath = basePath + filename;
+        String fullPath = FEEDBACK_BASE_PATH + filename;
         
         StringBuilder content = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(fullPath))) {

@@ -19,12 +19,7 @@ public class ContactFeedbackServlet extends HttpServlet {
         String exportFormat = request.getParameter("exportFormat");
         
         response.setContentType("text/html");
-        PrintWriter out;
-        try {
-            out = response.getWriter();
-        } catch (IOException e) {
-            throw new ServletException("Unable to get response writer", e);
-        }
+        PrintWriter out = response.getWriter();
         
         try {
             ContactFeedbackUtil util = new ContactFeedbackUtil();
@@ -63,6 +58,9 @@ public class ContactFeedbackServlet extends HttpServlet {
             out.println("</body></html>");
             out.close();
             
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ServletException("Operation interrupted", e);
         } catch (Exception e) {
             // Information disclosure - exposing stack trace
             out.println("<h3>Error occurred:</h3>");
@@ -73,11 +71,7 @@ public class ContactFeedbackServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            response.sendRedirect("contact-feedback.jsp");
-        } catch (IOException e) {
-            throw new ServletException("Unable to redirect", e);
-        }
+        response.sendRedirect("contact-feedback.jsp");
     }
 }
 
