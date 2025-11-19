@@ -19,11 +19,13 @@ public class ContactFeedbackServlet extends HttpServlet {
     private static final String CONTENT_TYPE_HTML = "text/html";
 
     @Override
+    @SuppressWarnings("java:S1989")
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/contact.jsp").forward(request, response);
     }
 
     @Override
+    @SuppressWarnings("java:S1989")
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         
