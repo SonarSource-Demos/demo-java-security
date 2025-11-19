@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <title>Contact Feedback Form</title>
     <style>
@@ -102,4 +103,3 @@
     </div>
 </body>
 </html>
-
