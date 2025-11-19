@@ -8,6 +8,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,8 @@ public class ContactFeedbackServlet extends HttpServlet {
     private static final String FIELD_FEEDBACK = "feedback";
     private static final String FIELD_CATEGORY = "category";
     private static final String FIELD_ID = "id";
+    private static final String HTML_START = "<html><body>";
+    private static final String HTML_END = "</body></html>";
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,12 +32,7 @@ public class ContactFeedbackServlet extends HttpServlet {
         String category = request.getParameter(FIELD_CATEGORY);
         
         try {
-            ContactFeedbackUtil util;
-            try {
-                util = new ContactFeedbackUtil();
-            } catch (java.sql.SQLException e) {
-                throw new ContactFeedbackException("Database connection failed", e);
-            }
+            ContactFeedbackUtil util = createUtil();
             
             // Store feedback with SQL injection vulnerability
             String feedbackId = util.storeFeedback(name, email, feedback, category);
@@ -42,28 +40,9 @@ public class ContactFeedbackServlet extends HttpServlet {
             // Retrieve and display feedback
             List<Map<String, String>> feedbackList = util.getFeedbackByEmail(email);
             
-            response.setContentType("text/html");
-            PrintWriter out = response.getWriter();
+            renderFeedbackSubmissionResponse(response, feedbackId, feedbackList);
             
-            out.println("<html><body>");
-            out.println("<h2>Thank you for your feedback!</h2>");
-            out.println("<p>Your feedback ID: " + feedbackId + "</p>");
-            out.println("<h3>Your previous feedback:</h3>");
-            
-            for (Map<String, String> fb : feedbackList) {
-                // XSS vulnerability - directly outputting user input
-                out.println("<div>");
-                out.println("<p><b>Name:</b> " + fb.get(FIELD_NAME) + "</p>");
-                out.println("<p><b>Email:</b> " + fb.get(FIELD_EMAIL) + "</p>");
-                out.println("<p><b>Category:</b> " + fb.get(FIELD_CATEGORY) + "</p>");
-                out.println("<p><b>Feedback:</b> " + fb.get(FIELD_FEEDBACK) + "</p>");
-                out.println("</div><hr>");
-            }
-            
-            out.println("</body></html>");
-            out.close();
-            
-        } catch (ContactFeedbackException e) {
+        } catch (ContactFeedbackException | SQLException e) {
             throw new ServletException("Error processing feedback", e);
         }
     }
@@ -74,45 +53,77 @@ public class ContactFeedbackServlet extends HttpServlet {
         String searchCategory = request.getParameter(FIELD_CATEGORY);
         
         try {
-            ContactFeedbackUtil util;
-            try {
-                util = new ContactFeedbackUtil();
-            } catch (java.sql.SQLException e) {
-                throw new ContactFeedbackException("Database connection failed", e);
-            }
-            List<Map<String, String>> feedbackList;
+            ContactFeedbackUtil util = createUtil();
+            List<Map<String, String>> feedbackList = getFeedbackList(util, searchEmail, searchCategory);
             
-            if (searchEmail != null && !searchEmail.isEmpty()) {
-                // SQL injection vulnerability in search
-                feedbackList = util.getFeedbackByEmail(searchEmail);
-            } else if (searchCategory != null && !searchCategory.isEmpty()) {
-                feedbackList = util.getFeedbackByCategory(searchCategory);
-            } else {
-                feedbackList = util.getAllFeedback();
-            }
+            renderFeedbackSearchResponse(response, feedbackList);
             
-            response.setContentType("text/html");
-            PrintWriter out = response.getWriter();
-            
-            out.println("<html><body>");
-            out.println("<h2>Feedback Results</h2>");
-            
-            for (Map<String, String> fb : feedbackList) {
-                // XSS vulnerability
-                out.println("<div>");
-                out.println("<p><b>ID:</b> " + fb.get(FIELD_ID) + "</p>");
-                out.println("<p><b>Name:</b> " + fb.get(FIELD_NAME) + "</p>");
-                out.println("<p><b>Email:</b> " + fb.get(FIELD_EMAIL) + "</p>");
-                out.println("<p><b>Category:</b> " + fb.get(FIELD_CATEGORY) + "</p>");
-                out.println("<p><b>Feedback:</b> " + fb.get(FIELD_FEEDBACK) + "</p>");
-                out.println("</div><hr>");
-            }
-            
-            out.println("</body></html>");
-            out.close();
-            
-        } catch (ContactFeedbackException e) {
+        } catch (ContactFeedbackException | SQLException e) {
             throw new ServletException("Error retrieving feedback", e);
+        }
+    }
+    
+    private ContactFeedbackUtil createUtil() throws SQLException {
+        return new ContactFeedbackUtil();
+    }
+    
+    private List<Map<String, String>> getFeedbackList(ContactFeedbackUtil util, String searchEmail, String searchCategory) throws ContactFeedbackException {
+        if (searchEmail != null && !searchEmail.isEmpty()) {
+            // SQL injection vulnerability in search
+            return util.getFeedbackByEmail(searchEmail);
+        } else if (searchCategory != null && !searchCategory.isEmpty()) {
+            return util.getFeedbackByCategory(searchCategory);
+        } else {
+            return util.getAllFeedback();
+        }
+    }
+    
+    private void renderFeedbackSubmissionResponse(HttpServletResponse response, String feedbackId, List<Map<String, String>> feedbackList) throws IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        
+        out.println(HTML_START);
+        out.println("<h2>Thank you for your feedback!</h2>");
+        out.println("<p>Your feedback ID: " + feedbackId + "</p>");
+        out.println("<h3>Your previous feedback:</h3>");
+        
+        renderFeedbackItems(out, feedbackList);
+        
+        out.println(HTML_END);
+        out.close();
+    }
+    
+    private void renderFeedbackSearchResponse(HttpServletResponse response, List<Map<String, String>> feedbackList) throws IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        
+        out.println(HTML_START);
+        out.println("<h2>Feedback Results</h2>");
+        
+        for (Map<String, String> fb : feedbackList) {
+            // XSS vulnerability
+            out.println("<div>");
+            out.println("<p><b>ID:</b> " + fb.get(FIELD_ID) + "</p>");
+            out.println("<p><b>Name:</b> " + fb.get(FIELD_NAME) + "</p>");
+            out.println("<p><b>Email:</b> " + fb.get(FIELD_EMAIL) + "</p>");
+            out.println("<p><b>Category:</b> " + fb.get(FIELD_CATEGORY) + "</p>");
+            out.println("<p><b>Feedback:</b> " + fb.get(FIELD_FEEDBACK) + "</p>");
+            out.println("</div><hr>");
+        }
+        
+        out.println(HTML_END);
+        out.close();
+    }
+    
+    private void renderFeedbackItems(PrintWriter out, List<Map<String, String>> feedbackList) {
+        for (Map<String, String> fb : feedbackList) {
+            // XSS vulnerability - directly outputting user input
+            out.println("<div>");
+            out.println("<p><b>Name:</b> " + fb.get(FIELD_NAME) + "</p>");
+            out.println("<p><b>Email:</b> " + fb.get(FIELD_EMAIL) + "</p>");
+            out.println("<p><b>Category:</b> " + fb.get(FIELD_CATEGORY) + "</p>");
+            out.println("<p><b>Feedback:</b> " + fb.get(FIELD_FEEDBACK) + "</p>");
+            out.println("</div><hr>");
         }
     }
 }
