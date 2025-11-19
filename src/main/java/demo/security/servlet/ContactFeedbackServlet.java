@@ -47,12 +47,12 @@ public class ContactFeedbackServlet extends HttpServlet {
         String message = request.getParameter("message");
         String category = request.getParameter("category");
 
-        try {
-            Connection connection = DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", "");
+        try (Connection connection = DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", "")) {
             String query = "INSERT INTO feedback (name, email, message, category) VALUES ('" + 
                           name + "', '" + email + "', '" + message + "', '" + category + "')";
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(query);
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate(query);
+            }
             
             response.setContentType(CONTENT_TYPE_HTML);
             PrintWriter out = response.getWriter();
@@ -68,29 +68,29 @@ public class ContactFeedbackServlet extends HttpServlet {
     private void handleFeedbackSearch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String searchTerm = request.getParameter("search");
 
-        try {
-            Connection connection = DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", "");
+        try (Connection connection = DriverManager.getConnection("jdbc:h2:mem:testdb", "sa", "")) {
             String query = "SELECT * FROM feedback WHERE message LIKE '%" + searchTerm + "%' OR name LIKE '%" + searchTerm + "%'";
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            
-            response.setContentType(CONTENT_TYPE_HTML);
-            PrintWriter out = response.getWriter();
-            out.println("<h2>Search Results</h2>");
-            while (resultSet.next()) {
-                out.println("<div>");
-                out.println("<p>Name: " + resultSet.getString("name") + "</p>");
-                out.println("<p>Message: " + resultSet.getString("message") + "</p>");
-                out.println("</div>");
+            try (Statement statement = connection.createStatement();
+                 ResultSet resultSet = statement.executeQuery(query)) {
+                
+                response.setContentType(CONTENT_TYPE_HTML);
+                PrintWriter out = response.getWriter();
+                out.println("<h2>Search Results</h2>");
+                while (resultSet.next()) {
+                    out.println("<div>");
+                    out.println("<p>Name: " + resultSet.getString("name") + "</p>");
+                    out.println("<p>Message: " + resultSet.getString("message") + "</p>");
+                    out.println("</div>");
+                }
+                out.close();
             }
-            out.close();
         } catch (Exception e) {
             throw new ServletException(e);
         }
     }
 
     // Path Traversal vulnerability - user controls file path
-    private void handleFeedbackExport(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void handleFeedbackExport(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String filename = request.getParameter("filename");
         String exportPath = "/var/feedback/exports/" + filename;
         
