@@ -135,15 +135,18 @@ public class ContactFeedbackServlet extends HttpServlet {
     }
     
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
         // Missing authentication check - security vulnerability
-        doPost(request, response);
+        try {
+            doPost(request, response);
+        } catch (ServletException | IOException e) {
+            // Information disclosure - logging exception details
+            e.printStackTrace();
+        }
     }
     
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
         // Missing authentication check - security vulnerability
         String email = request.getParameter("email");
         
@@ -159,7 +162,8 @@ public class ContactFeedbackServlet extends HttpServlet {
                 out.println("Feedback deleted for: " + email);
                 out.close();
             } catch (Exception e) {
-                throw new ServletException(e);
+                // Information disclosure - logging exception details
+                e.printStackTrace();
             }
         }
     }
