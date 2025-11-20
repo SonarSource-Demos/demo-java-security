@@ -8,7 +8,9 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.servlet.http.Cookie;
@@ -39,20 +41,26 @@ public class Insecure {
     return resultSet.getString(0);
   }
 
-  public String taintedSQLByUsername(HttpServletRequest request, Connection connection) throws Exception {
+  public String taintedSQLByUsername(HttpServletRequest request, Connection connection) throws SQLException {
     String username = request.getParameter("username");
-    String query = "SELECT * FROM users WHERE username = '" + username + "'";
-    Statement statement = connection.createStatement();
-    ResultSet resultSet = statement.executeQuery(query);
-    return resultSet.getString(1);
+    String query = "SELECT * FROM users WHERE username = ?";
+    try (PreparedStatement statement = connection.prepareStatement(query)) {
+      statement.setString(1, username);
+      try (ResultSet resultSet = statement.executeQuery()) {
+        return resultSet.getString(1);
+      }
+    }
   }
 
-  public String taintedSQLByEmail(HttpServletRequest request, Connection connection) throws Exception {
+  public String taintedSQLByEmail(HttpServletRequest request, Connection connection) throws SQLException {
     String email = request.getParameter("email");
-    String query = "SELECT * FROM users WHERE email = '" + email + "'";
-    Statement statement = connection.createStatement();
-    ResultSet resultSet = statement.executeQuery(query);
-    return resultSet.getString(1);
+    String query = "SELECT * FROM users WHERE email = ?";
+    try (PreparedStatement statement = connection.prepareStatement(query)) {
+      statement.setString(1, email);
+      try (ResultSet resultSet = statement.executeQuery()) {
+        return resultSet.getString(1);
+      }
+    }
   }
   
   public String hotspotSQL(Connection connection, String user) throws Exception {
