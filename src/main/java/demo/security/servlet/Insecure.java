@@ -38,6 +38,14 @@ public class Insecure {
     ResultSet resultSet = statement.executeQuery(query);
     return resultSet.getString(0);
   }
+
+  public String taintedSQLByEmail(HttpServletRequest request, Connection connection) throws Exception {
+    String email = request.getParameter("email");
+    String query = "SELECT * FROM users WHERE email = '" + email + "'";
+    Statement statement = connection.createStatement();
+    ResultSet resultSet = statement.executeQuery(query);
+    return resultSet.getString(1);
+  }
   
   public String hotspotSQL(Connection connection, String user) throws Exception {
 	  Statement statement = null;
