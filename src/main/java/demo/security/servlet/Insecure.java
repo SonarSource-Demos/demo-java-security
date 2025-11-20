@@ -8,6 +8,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -41,9 +42,10 @@ public class Insecure {
 
   public String taintedSQLByEmail(HttpServletRequest request, Connection connection) throws Exception {
     String email = request.getParameter("email");
-    String query = "SELECT * FROM users WHERE email = '" + email + "'";
-    Statement statement = connection.createStatement();
-    ResultSet resultSet = statement.executeQuery(query);
+    String query = "SELECT * FROM users WHERE email = ?";
+    PreparedStatement statement = connection.prepareStatement(query);
+    statement.setString(1, email);
+    ResultSet resultSet = statement.executeQuery();
     return resultSet.getString(1);
   }
   
