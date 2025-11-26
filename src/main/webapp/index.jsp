@@ -5,5 +5,7 @@
     Enter Name: <input type="text" name="name" size="20">
     <input type="submit" value="Submit" />
 </form>
+<hr>
+<a href="contact-feedback.jsp">Contact Feedback Form</a>
 </body>
 </html>
