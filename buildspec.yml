@@ -1,8 +1,10 @@
 version: 0.2
 
+# This buildspec runs on all feature branches and main
 phases:
   build:
     commands:
+      - echo "Building on branch ${CODEBUILD_WEBHOOK_HEAD_REF}"
       - mvn verify
   post_build:
     commands:

@@ -1,6 +1,5 @@
 package demo.security.util;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,5 +32,13 @@ public class DBUtils {
             items.add(resultSet.getString(0));
         }
         return items;
+    }
+
+    public void saveFeedback(String name, String email, String subject, String message) throws SQLException {
+        // SQL Injection vulnerability - concatenating user input directly
+        String query = "INSERT INTO feedback (name, email, subject, message) VALUES ('" 
+            + name + "', '" + email + "', '" + subject + "', '" + message + "')";
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(query);
     }
 }
