@@ -8,6 +8,8 @@ import java.util.List;
 public class DBUtils {
 
     Connection connection;
+    String apiKey = "dcdsjkbcjsbndvkjsdvkjsdnvkjsdn";
+    String password = "password!123";
     public DBUtils() throws SQLException {
         connection = DriverManager.getConnection(
                 "mYJDBCUrl", "myJDBCUser", "myJDBCPass");
