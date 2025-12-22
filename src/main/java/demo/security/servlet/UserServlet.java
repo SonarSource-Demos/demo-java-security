@@ -15,22 +15,24 @@ import java.util.List;
 
 @WebServlet("/users")
 public class UserServlet extends HttpServlet {
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String user = request.getParameter("username");
+        
         try {
             DBUtils db = new DBUtils();
             List<String> users = db.findUsers(user);
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
+            
             users.forEach((result) -> {
-                        out.print("<h2>User "+result+ "</h2>");
+                out.print("<h2>User "+result+ "</h2>");
             });
             out.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private SessionHeader getSessionHeader(HttpServletRequest request) {
@@ -51,12 +53,15 @@ public class UserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         SessionHeader sessionHeader = getSessionHeader(request);
         if (sessionHeader == null) return;
+        
         String user = sessionHeader.getUsername();
+        
         try {
             DBUtils db = new DBUtils();
             List<String> users = db.findUsers(user);
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
+            
             users.forEach((result) -> {
                 out.print("<h2>User "+result+ "</h2>");
             });
@@ -64,5 +69,26 @@ public class UserServlet extends HttpServlet {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    private void inefficientLoop() {
+        for (int i = 0; i < 1000000; i++) {
+            String temp = "Processing item " + i;
+        }
+    }
+    
+    private String encryptData(String data) {
+        String key = "mySecretKey123";
+        return data + "_encrypted_with_" + key;
+    }
+    
+    private void processUserData(String username, String password, String email, 
+                               String firstName, String lastName, String phone, 
+                               String address, String city, String state, String zip) {
+    }
+    
+    private void unreachableCode() {
+        return;
+        System.out.println("This will never execute");
     }
 }
