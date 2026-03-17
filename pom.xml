@@ -12,8 +12,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <sonar.projectKey>demo:java-security</sonar.projectKey>
-    <sonar.projectName>Java Web App</sonar.projectName>
+    <sonar.projectKey>sonar-solutions_event-demo-java-security</sonar.projectKey>
+    <sonar.organization>sonar-solutions</sonar.organization>
+    <sonar.projectName>Event Demo Java Security</sonar.projectName>
   </properties>
   <dependencies>
     <dependency>
