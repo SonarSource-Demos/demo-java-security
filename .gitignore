@@ -30,3 +30,7 @@ java-security.iml
 
 # local Files
 scanner-maven.sh
+.mcp.json
+
+#agents specific file
+.sonar-code-context
