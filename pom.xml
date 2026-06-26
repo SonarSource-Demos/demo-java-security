@@ -36,6 +36,13 @@
       <artifactId>commons-codec</artifactId>
       <version>1.16.0</version>
     </dependency>
+    <!-- Hutool: modeled by the javasecurity-advanced config (NOT the base/Enterprise config).
+         Added to demonstrate taint flows that only the advanced library config detects. -->
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
+      <version>5.8.27</version>
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
