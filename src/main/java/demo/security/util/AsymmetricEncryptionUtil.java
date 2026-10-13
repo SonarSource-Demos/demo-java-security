@@ -2,6 +2,7 @@ package demo.security.util;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -11,7 +12,7 @@ import javax.crypto.Cipher;
 public class AsymmetricEncryptionUtil {
     private KeyPair keyPair;
 
-    public void generateKeys(int keySize) throws Exception {
+    public void generateKeys(int keySize) throws NoSuchAlgorithmException {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         SecureRandom random = SecureRandom.getInstanceStrong();
         keyGen.initialize(keySize, random);
