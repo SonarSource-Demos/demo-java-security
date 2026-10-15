@@ -1,0 +1,67 @@
+package demo.security.servlet;
+
+import demo.security.util.DBUtils;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@WebServlet("/api/user")
+public class FindUserServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String username = request.getParameter("username");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        if (username == null || username.trim().isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("{\"error\":\"username parameter is required\"}");
+            return;
+        }
+
+        try {
+            DBUtils db = new DBUtils();
+            List<String> users = db.findUsers(username);
+            if (users.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().print("{\"error\":\"user not found\"}");
+                return;
+            }
+            String ids = users.stream()
+                    .map(id -> "\"" + escapeJson(id) + "\"")
+                    .collect(Collectors.joining(","));
+            PrintWriter out = response.getWriter();
+            out.print("{\"username\":\"" + escapeJson(username) + "\",\"userIds\":[" + ids + "]}");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().print("{\"error\":\"lookup failed\"}");
+        }
+    }
+
+    private static String escapeJson(String value) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '"': sb.append("\\\""); break;
+                case '\\': sb.append("\\\\"); break;
+                case '\n': sb.append("\\n"); break;
+                case '\r': sb.append("\\r"); break;
+                case '\t': sb.append("\\t"); break;
+                default:
+                    if (c < 0x20) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+            }
+        }
+        return sb.toString();
+    }
+}
