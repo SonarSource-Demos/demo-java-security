@@ -18,11 +18,15 @@ import java.security.*;
 
 public class Utils {
 
+    private Utils() {
+        /* This utility class should not be instantiated */
+    }
+
     public static KeyPair generateKey() {
         KeyPairGenerator keyPairGen;
         try {
             keyPairGen = KeyPairGenerator.getInstance("RSA");
-            keyPairGen.initialize(512);
+            keyPairGen.initialize(2048);
             return keyPairGen.genKeyPair();
         } catch (NoSuchAlgorithmException e) {
             return null;
@@ -30,8 +34,13 @@ public class Utils {
     }
 
     public static void deleteFile(String fileName) throws IOException {
-        File file = new File(fileName);
-        FileUtils.forceDelete(file);
+        String baseDirectory = new File(System.getProperty("user.dir")).getCanonicalPath() + File.separator;
+        File file = new File(baseDirectory, fileName);
+        String canonicalPath = file.getCanonicalPath();
+        if (!canonicalPath.startsWith(baseDirectory)) {
+            throw new IOException("Entry is outside of the target directory");
+        }
+        FileUtils.forceDelete(new File(canonicalPath));
     }
 
     public static void executeJs(String input) throws ScriptException {
