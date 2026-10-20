@@ -17,8 +17,12 @@ import java.util.List;
 public class UserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String user = request.getParameter("username");
+        String user = request.getRemoteUser();
         try {
+            if (user == null || user.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
             DBUtils db = new DBUtils();
             List<String> users = db.findUsers(user);
             response.setContentType("text/html");
