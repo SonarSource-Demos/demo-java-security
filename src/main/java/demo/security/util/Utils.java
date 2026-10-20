@@ -1,7 +1,6 @@
 package demo.security.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.FileUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
@@ -13,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
 
@@ -29,9 +30,26 @@ public class Utils {
         }
     }
 
-    public static void deleteFile(String fileName) throws IOException {
-        File file = new File(fileName);
-        FileUtils.forceDelete(file);
+    public static void deleteFile(File baseDir, String fileName) throws IOException {
+        if (baseDir == null || fileName == null || fileName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid file name");
+        }
+        Path base = baseDir.toPath().toAbsolutePath().normalize();
+        Path requested = Paths.get(fileName);
+        if (requested.isAbsolute()) {
+            throw new IllegalArgumentException("Absolute paths are not allowed");
+        }
+        Path target = base.resolve(requested).normalize();
+        if (!target.startsWith(base) || target.equals(base)) {
+            throw new IllegalArgumentException("Path is outside the allowed directory");
+        }
+        if (!Files.isRegularFile(target, LinkOption.NOFOLLOW_LINKS)) {
+            throw new IllegalArgumentException("Only regular files can be deleted");
+        }
+        if (!target.toRealPath().startsWith(base.toRealPath())) {
+            throw new IllegalArgumentException("Path is outside the allowed directory");
+        }
+        Files.delete(target);
     }
 
     public static void executeJs(String input) throws ScriptException {
