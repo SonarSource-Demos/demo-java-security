@@ -14,9 +14,23 @@ import java.io.IOException;
 public class ScriptServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String data = request.getParameter("data");
         try {
+            if (request.getUserPrincipal() == null) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+            if (!request.isUserInRole("admin")) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            String data = request.getParameter("data");
+            if (data == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
             Utils.executeJs(data);
+        } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } catch (ScriptException e) {
             throw new RuntimeException(e);
         }
