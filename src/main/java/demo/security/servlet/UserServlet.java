@@ -9,12 +9,16 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
 @WebServlet("/users")
 public class UserServlet extends HttpServlet {
+    private static final ObjectInputFilter SESSION_HEADER_FILTER = ObjectInputFilter.Config.createFilter(
+            "demo.security.util.SessionHeader;java.lang.String;maxdepth=2;maxrefs=10;maxbytes=4096;maxarray=0;!*");
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String user = request.getParameter("username");
@@ -35,16 +39,24 @@ public class UserServlet extends HttpServlet {
 
     private SessionHeader getSessionHeader(HttpServletRequest request) {
         String sessionAuth = request.getHeader("Session-Auth");
-        if (sessionAuth != null) {
-            try {
-                byte[] decoded = Base64.decodeBase64(sessionAuth);
-                ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(decoded));
-                return (SessionHeader) in.readObject();
-            } catch (Exception e) {
-                return null;
-            }
+        return decodeSessionHeader(sessionAuth);
+    }
+
+    static SessionHeader decodeSessionHeader(String sessionAuth) {
+        if (sessionAuth == null) {
+            return null;
         }
-        return null;
+        byte[] decoded = Base64.decodeBase64(sessionAuth);
+        try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(decoded))) {
+            in.setObjectInputFilter(SESSION_HEADER_FILTER);
+            Object obj = in.readObject();
+            if (obj instanceof SessionHeader sessionHeader) {
+                return sessionHeader;
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
