@@ -14,11 +14,27 @@ import java.io.IOException;
 public class ScriptServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (request.getUserPrincipal() == null) {
+            reject(response, HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+        if (!request.isUserInRole("admin")) {
+            reject(response, HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
         String data = request.getParameter("data");
         try {
             Utils.executeJs(data);
         } catch (ScriptException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void reject(HttpServletResponse response, int status) {
+        try {
+            response.sendError(status);
+        } catch (IOException e) {
+            response.setStatus(status);
         }
     }
 }
