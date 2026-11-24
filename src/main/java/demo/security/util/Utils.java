@@ -1,7 +1,6 @@
 package demo.security.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.FileUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
@@ -29,9 +28,16 @@ public class Utils {
         }
     }
 
-    public static void deleteFile(String fileName) throws IOException {
-        File file = new File(fileName);
-        FileUtils.forceDelete(file);
+    public static void deleteFile(File baseDir, String fileName) throws IOException {
+        File base = baseDir.getCanonicalFile();
+        File target = new File(base, fileName).getCanonicalFile();
+        if (!target.toPath().startsWith(base.toPath()) || target.equals(base)) {
+            throw new IllegalArgumentException("path outside allowed directory");
+        }
+        if (target.isDirectory()) {
+            throw new IllegalArgumentException("directories cannot be deleted");
+        }
+        Files.delete(target.toPath());
     }
 
     public static void executeJs(String input) throws ScriptException {
