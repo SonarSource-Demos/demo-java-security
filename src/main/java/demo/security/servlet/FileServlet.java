@@ -13,7 +13,28 @@ import java.io.IOException;
 public class FileServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (request.getUserPrincipal() == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+        if (!request.isUserInRole("admin")) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
         String data = request.getParameter("data");
-        Utils.deleteFile(data);
+        if (data == null || data.trim().isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        try {
+            Utils.deleteFile(data);
+        } catch (IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 }
