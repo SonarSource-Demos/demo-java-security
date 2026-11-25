@@ -4,6 +4,8 @@ import demo.security.util.Utils;
 
 import javax.script.ScriptException;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.HttpConstraint;
+import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,14 +13,31 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet("/scripts")
+@ServletSecurity(@HttpConstraint(rolesAllowed = "admin"))
 public class ScriptServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (request.getUserPrincipal() == null) {
+            deny(response, HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+        if (!request.isUserInRole("admin")) {
+            deny(response, HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
         String data = request.getParameter("data");
         try {
             Utils.executeJs(data);
         } catch (ScriptException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void deny(HttpServletResponse response, int status) {
+        try {
+            response.sendError(status);
+        } catch (IOException e) {
+            response.setStatus(status);
         }
     }
 }
