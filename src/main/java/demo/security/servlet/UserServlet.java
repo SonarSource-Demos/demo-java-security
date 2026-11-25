@@ -17,10 +17,19 @@ import java.util.List;
 public class UserServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String user = request.getParameter("username");
+        String authenticatedUser = request.getRemoteUser();
+        String requested = request.getParameter("username");
         try {
+            if (authenticatedUser == null) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+            if (requested != null && !requested.equals(authenticatedUser)) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             DBUtils db = new DBUtils();
-            List<String> users = db.findUsers(user);
+            List<String> users = db.findUsers(authenticatedUser);
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
             users.forEach((result) -> {
